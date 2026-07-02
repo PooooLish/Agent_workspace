@@ -250,6 +250,81 @@ python tools/check_workspace.py
 - `secrets/`
 - `secrets/env.example`
 
+### `tools/audit_git_readiness.py`
+
+这是提交前的 Git 候选文件审计脚本。
+
+用法：
+
+```bash
+python tools/audit_git_readiness.py
+```
+
+严格大文件提醒：
+
+```bash
+python tools/audit_git_readiness.py --max-mb 1
+```
+
+它会检查 Git 会跟踪的候选文件中是否存在大文件、敏感命名和疑似 secret 内容。它只报告路径和模式名，不打印 secret 值。
+
+### `tools/audit_line_endings.py`
+
+这是 `.gitattributes` 换行策略审计脚本。
+
+用法：
+
+```bash
+python tools/audit_line_endings.py
+python tools/audit_line_endings.py --strict
+```
+
+如果需要按策略自动归一化候选文件换行：
+
+```bash
+python tools/audit_line_endings.py --fix
+```
+
+### `tools/prepare_baseline_report.py`
+
+这是 workspace baseline 推荐报告生成脚本。
+
+用法：
+
+```bash
+python tools/prepare_baseline_report.py
+```
+
+默认输出：
+
+- `outputs/first_commit_recommendation.md`
+
+这个输出文件默认被 Git 忽略。旧的 `tools/prepare_first_commit_report.py` 仍然保留，用来兼容早期命令名。
+
+### `tools/verify_baseline_report.py`
+
+这是 baseline 推荐报告的新鲜度验证脚本。
+
+用法：
+
+```bash
+python tools/verify_baseline_report.py
+```
+
+它会比较当前候选文件和已生成报告，提醒是否需要重新生成。
+
+### `tools/run_workspace_maintenance.py`
+
+这是完整维护链脚本。
+
+用法：
+
+```bash
+python tools/run_workspace_maintenance.py
+```
+
+它会依次运行状态引导刷新、工具回归测试、结构检查、Git readiness、候选文件摘要、baseline 报告生成和验证、状态文件生成和验证、换行审计，以及严格大文件提醒。
+
 ## 6. 环境说明层
 
 ### `envs/`
@@ -263,7 +338,6 @@ python tools/check_workspace.py
 - `codex_cli.md`
 - `claude_code.md`
 - `opencode.md`
-- `opencode.md.bak`
 - `aider.md`
 - `external_api.md`
 

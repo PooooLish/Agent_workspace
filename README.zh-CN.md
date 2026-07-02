@@ -117,6 +117,30 @@ opencode .
 - 接外部 API：`sops/setup_external_api.md` + `secrets/env.example`
 - 结束任务：`sops/task_closeout.md`
 
+## 提交前如何检查
+
+推荐运行：
+
+```powershell
+python tools/check_workspace.py
+python tools/audit_git_readiness.py
+python tools/audit_line_endings.py --strict
+python tools/test_workspace_tools.py
+python tools/summarize_git_candidates.py
+python tools/prepare_baseline_report.py
+python tools/verify_baseline_report.py
+python tools/generate_workspace_status.py
+python tools/verify_workspace_status.py
+```
+
+也可以直接运行完整维护链：
+
+```powershell
+python tools/run_workspace_maintenance.py
+```
+
+baseline 推荐报告写入 `outputs/first_commit_recommendation.md`，该文件默认被 Git 忽略。大范围结构提交前，优先看这个报告和 `WORKSPACE_STATUS.md`，并确认 `git ls-files tasks` 只包含有意公开的任务占位文件。
+
 ## secrets 的处理方式
 
 - 不要把真实 API key、token、SSH key、密码写入仓库。
