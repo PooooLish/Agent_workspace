@@ -1,0 +1,192 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+
+TASK_DIRS = [
+    "src",
+    "scripts",
+    "data",
+    "outputs",
+    "tests",
+    "tmp",
+    "logs",
+    "docs",
+    "docs/skills",
+]
+
+TASK_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
+
+
+def write_if_missing(path: Path, content: str, created: list[str], skipped: list[str]) -> None:
+    if path.exists():
+        skipped.append(str(path))
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+    created.append(str(path))
+
+
+def build_task_agents(task_name: str) -> str:
+    return f"""# AGENTS.md
+
+## Task role
+
+- Work only inside this task folder unless explicitly asked otherwise.
+- Keep changes small, reviewable, and easy to verify.
+
+## Rule relationship
+
+- Follow the workspace root `AGENTS.md` first.
+- This task-level `AGENTS.md` adds task-specific rules for `{task_name}`.
+- The task rules may supplement or tighten the root rules.
+- The task rules must not weaken the root safety rules.
+- If two rules seem to conflict, follow the stricter rule.
+
+## Safety rules
+
+- Do not delete files without approval.
+- Do not store or print real secrets.
+- Keep outputs in `outputs/`, scratch files in `tmp/`, and logs in `logs/`.
+- Keep task-specific skills, notes, and checklists under `docs/skills/` unless there is a better local path for the task.
+
+## Workflow
+
+1. Read the workspace root `AGENTS.md`.
+2. Read this file, `task.md`, and `README.md`.
+3. Inspect existing files.
+4. Propose a short plan.
+5. Make the minimum useful change.
+6. Run the minimum verification command.
+7. Report changed files, commands run, and verification result.
+
+## Task name
+
+- `{task_name}`
+"""
+
+
+def build_task_md(task_name: str) -> str:
+    return f"""# Task: {task_name}
+
+## Goal
+
+Describe the task objective here.
+
+## Constraints
+
+- Keep work inside this task directory.
+- Do not store real secrets.
+
+## Inputs
+
+List the files, data, or references needed for this task.
+
+## Expected output
+
+Describe the intended deliverable and verification method.
+"""
+
+
+def build_readme(task_name: str) -> str:
+    return f"""# {task_name}
+
+This task folder was created by `tools/make_task.py`.
+
+## Suggested workflow
+
+1. Fill in `task.md`.
+2. Read the workspace root `AGENTS.md`.
+3. Read local `AGENTS.md` and `README.md`.
+4. Put source code in `src/`.
+5. Put helper scripts in `scripts/`.
+6. Put tests in `tests/`.
+7. Put generated results in `outputs/`.
+8. Put task-specific skills and lessons in `docs/skills/`.
+"""
+
+
+TASK_GITIGNORE = """outputs/
+tmp/
+logs/
+__pycache__/
+.pytest_cache/
+.venv/
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.*
+"""
+
+
+def main() -> int:
+    if len(sys.argv) not in (2, 3):
+        print("Usage: python tools/make_task.py task_name [--dry-run]")
+        return 1
+
+    task_name = sys.argv[1].strip()
+    dry_run = len(sys.argv) == 3 and sys.argv[2] == "--dry-run"
+    if len(sys.argv) == 3 and not dry_run:
+        print("Error: the only supported option is --dry-run.")
+        return 1
+
+    if not task_name:
+        print("Error: task_name cannot be empty.")
+        return 1
+    if not TASK_NAME_RE.fullmatch(task_name):
+        print("Error: task_name must start with a letter or number and contain only letters, numbers, underscores, or hyphens.")
+        return 1
+
+    workspace_root = Path(__file__).resolve().parents[1]
+    tasks_root = workspace_root / "tasks"
+    task_root = tasks_root / task_name
+    resolved_task_root = task_root.resolve()
+    resolved_tasks_root = tasks_root.resolve()
+    if resolved_tasks_root not in resolved_task_root.parents:
+        print("Error: resolved task path must stay inside the tasks directory.")
+        return 1
+
+    created: list[str] = []
+    skipped: list[str] = []
+
+    if dry_run:
+        print(f"Dry run: task directory would be created at {task_root}")
+        print("Planned directories:")
+        for dirname in TASK_DIRS:
+            print(f"  + {task_root / dirname}")
+        print("Planned files:")
+        for filename in ("AGENTS.md", "task.md", "README.md", ".gitignore"):
+            print(f"  + {task_root / filename}")
+        return 0
+
+    task_root.mkdir(parents=True, exist_ok=True)
+    for dirname in TASK_DIRS:
+        dir_path = task_root / dirname
+        if not dir_path.exists():
+            dir_path.mkdir(parents=True, exist_ok=True)
+            created.append(str(dir_path))
+
+    write_if_missing(task_root / "AGENTS.md", build_task_agents(task_name), created, skipped)
+    write_if_missing(task_root / "task.md", build_task_md(task_name), created, skipped)
+    write_if_missing(task_root / "README.md", build_readme(task_name), created, skipped)
+    write_if_missing(task_root / ".gitignore", TASK_GITIGNORE, created, skipped)
+
+    print("Created items:")
+    for item in created:
+        print(f"  + {item}")
+
+    print("Skipped existing items:")
+    for item in skipped:
+        print(f"  = {item}")
+
+    print(f"Task directory ready: {task_root}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

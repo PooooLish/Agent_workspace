@@ -1,0 +1,149 @@
+# Workspace Status
+
+Last generated: 2026-07-02
+
+This file records the current operating state of `D:\MaHong\agent_workspace`.
+
+Regenerate it with:
+
+```powershell
+python tools/generate_workspace_status.py
+```
+
+## Current Health
+
+- Structure check: passing.
+- Git readiness audit: passing.
+- First-commit recommendation: available in `outputs/first_commit_recommendation.md`.
+- Git candidate files: 59.
+- Git candidate size: about 0.14 MB.
+- Recommended baseline files: 59.
+- Manual confirmation items for first commit: 0.
+- Confirmed public/site assets included: 0.
+- Line ending drift reminders: 31.
+- Strict 1 MB large-file reminders: 0.
+
+## Core Commands
+
+```powershell
+python tools/check_workspace.py
+python tools/audit_git_readiness.py
+python tools/audit_line_endings.py
+python tools/test_workspace_tools.py
+python tools/summarize_git_candidates.py
+python tools/prepare_first_commit_report.py
+python tools/verify_first_commit_report.py
+python tools/generate_workspace_status.py
+python tools/verify_workspace_status.py
+python tools/run_workspace_maintenance.py
+```
+
+Use stricter large-file review when preparing a careful first commit:
+
+```powershell
+python tools/audit_git_readiness.py --max-mb 1
+```
+
+## Current Tools
+
+- `tools/make_task.py`: creates isolated task folders with safe defaults and `--dry-run`.
+- `tools/check_workspace.py`: checks required workspace structure, task baseline files, task index coverage and quality, tool/skill/SOP/prompt/environment registry coverage, Git ignore behavior, and UTF-8 text readability.
+- `tools/audit_git_readiness.py`: checks Git candidates for large files, sensitive names, and secret-like content.
+- `tools/audit_line_endings.py`: reports line ending drift against `.gitattributes` policy.
+- `tools/test_workspace_tools.py`: runs lightweight regression tests for workspace tools.
+- `tools/summarize_git_candidates.py`: summarizes Git candidates by area, extension, and largest files.
+- `tools/prepare_first_commit_report.py`: writes the first-commit recommendation report.
+- `tools/verify_first_commit_report.py`: verifies that the first-commit recommendation matches current Git candidates.
+- `tools/generate_workspace_status.py`: regenerates this current-state summary.
+- `tools/verify_workspace_status.py`: verifies that `WORKSPACE_STATUS.md` matches the current generated status.
+- `tools/run_workspace_maintenance.py`: runs the full maintenance chain.
+
+## Current Skills
+
+- `skills/cli_tool_setup/SKILL.md`
+- `skills/code_review/SKILL.md`
+- `skills/documentation_writer/SKILL.md`
+- `skills/linux_debugging/SKILL.md`
+- `skills/python_project_setup/SKILL.md`
+- `skills/valorant-highlight-editing/agents/openai.yaml`
+- `skills/valorant-highlight-editing/references/platform_style_patterns.md`
+- `skills/valorant-highlight-editing/references/research_sources.md`
+- `skills/valorant-highlight-editing/references/software_toolchain.md`
+- `skills/valorant-highlight-editing/SKILL.md`
+
+## Current SOPs
+
+- `sops/debug_error.md`
+- `sops/git_first_commit.md`
+- `sops/line_endings.md`
+- `sops/modify_existing_project.md`
+- `sops/new_task.md`
+- `sops/safe_shell_commands.md`
+- `sops/setup_external_api.md`
+- `sops/task_closeout.md`
+- `sops/workspace_maintenance.md`
+
+## Current Prompts
+
+- `prompts/aider_default.md`
+- `prompts/claude_code_default.md`
+- `prompts/code_review.md`
+- `prompts/codex_default.md`
+- `prompts/opencode_default.md`
+- `prompts/safe_debug.md`
+- `prompts/safe_setup.md`
+
+## Current Environments
+
+- `envs/aider.md`
+- `envs/base_python.md`
+- `envs/claude_code.md`
+- `envs/codex_cli.md`
+- `envs/external_api.md`
+- `envs/node_tools.md`
+- `envs/opencode.md`
+
+## Git Baseline Notes
+
+The current first-commit recommendation treats all 59 recommended files as baseline candidates.
+
+Repository normalization is governed by `.gitattributes`:
+
+- most text files use LF line endings
+- Windows command scripts use CRLF line endings
+- images, media, archives, and model artifacts are treated as binary
+
+Important exclusions are governed by `.gitignore`:
+
+- generated outputs, logs, temporary files, and caches
+- dependency folders such as `node_modules/`
+- local `.env` files and secret material
+- raw video media and selected source media
+- local backup files such as `*.bak`
+- local Playwright CLI artifacts
+- temporary verification task `tasks/good_task-name_123/`
+
+## Confirmed Public/Site Assets
+
+These `llm_101` public assets are intentionally included in the baseline recommendation:
+
+- `tasks/llm_101/docs/public/content-index.json`
+- `tasks/llm_101/docs/public/hero-banner.png`
+- `tasks/llm_101/docs/public/logo.png`
+
+## Pending Cleanup
+
+- `tasks/good_task-name_123/` is a temporary verification task created during tool testing.
+- It is ignored by Git: yes.
+- Delete it only after explicit user approval.
+
+## Ignored Generated Reports
+
+- `outputs/first_commit_recommendation.md` ignored by Git: yes.
+
+## Next Reasonable Actions
+
+1. Ask for explicit approval if cleanup of `tasks/good_task-name_123/` is desired.
+2. Review `outputs/first_commit_recommendation.md`.
+3. Stage and commit only after the checks above pass.
+4. Regenerate this file after broad workspace maintenance.

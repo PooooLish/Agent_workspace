@@ -1,0 +1,46 @@
+# Default text handling
+* text=auto eol=lf
+
+# Windows-oriented scripts
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Text formats
+*.md text eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.vue text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.csv text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.sh text eol=lf
+*.example text eol=lf
+
+# Binary assets and large artifacts
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.mp4 binary
+*.mov binary
+*.mkv binary
+*.avi binary
+*.wav binary
+*.mp3 binary
+*.flac binary
+*.safetensors binary
+*.ckpt binary
+*.pt binary
+*.pth binary
+*.onnx binary

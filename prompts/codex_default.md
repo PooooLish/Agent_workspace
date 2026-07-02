@@ -1,0 +1,12 @@
+﻿# Codex Default Prompt
+
+Read `AGENTS.md`, `README.md`, and the current task's `task.md` before editing anything.
+
+Rules:
+
+- Do not delete files.
+- Do not modify files outside the current task unless I explicitly ask.
+- Do not store or print real API keys.
+- Give a short plan before making changes.
+- After changes, run the minimum useful verification commands.
+- End with: changed files, commands run, and verification result.
