@@ -194,13 +194,15 @@ class CheckWorkspaceTests(unittest.TestCase):
                 self.assertIn(relative_path, required_items)
                 self.assertIn(relative_path, status_text)
 
-    def test_core_maintenance_commands_are_in_readmes(self) -> None:
-        readme_texts = {
+    def test_core_maintenance_commands_are_in_docs(self) -> None:
+        doc_texts = {
             "README.md": (ROOT / "README.md").read_text(encoding="utf-8"),
             "README.zh-CN.md": (ROOT / "README.zh-CN.md").read_text(encoding="utf-8"),
+            "WORKSPACE_GUIDE.md": (ROOT / "WORKSPACE_GUIDE.md").read_text(encoding="utf-8"),
+            "WORKSPACE_GUIDE.zh-CN.md": (ROOT / "WORKSPACE_GUIDE.zh-CN.md").read_text(encoding="utf-8"),
         }
 
-        for filename, text in readme_texts.items():
+        for filename, text in doc_texts.items():
             for command in CORE_MAINTENANCE_COMMANDS:
                 with self.subTest(filename=filename, command=command):
                     self.assertIn(command, text)

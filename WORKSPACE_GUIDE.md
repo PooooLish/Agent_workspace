@@ -340,6 +340,18 @@ python tools/test_workspace_tools.py
 
 It uses only the Python standard library and avoids creating files except through explicit dry-run checks.
 
+### `tools/audit_line_endings.py`
+
+This script audits candidate file line endings against `.gitattributes`.
+
+Usage:
+
+```bash
+python tools/audit_line_endings.py --strict
+```
+
+Use `--fix` when you intentionally want to rewrite candidate files to the configured policy.
+
 ### `tools/prepare_baseline_report.py`
 
 This script writes a Markdown recommendation for the current workspace baseline.
@@ -363,6 +375,16 @@ What it does:
 The output lives in `outputs/`, so it is intentionally not tracked by Git unless explicitly moved.
 
 The older `tools/prepare_first_commit_report.py` command remains available for compatibility.
+
+### `tools/verify_baseline_report.py`
+
+This script verifies that the generated baseline report still matches the current Git candidates.
+
+Usage:
+
+```bash
+python tools/verify_baseline_report.py
+```
 
 ### `tools/generate_workspace_status.py`
 
@@ -683,6 +705,18 @@ Run full workspace maintenance:
 
 ```bash
 python tools/run_workspace_maintenance.py
+```
+
+Verify baseline report:
+
+```bash
+python tools/verify_baseline_report.py
+```
+
+Verify workspace status:
+
+```bash
+python tools/verify_workspace_status.py
 ```
 
 Launch OpenCode in a task:

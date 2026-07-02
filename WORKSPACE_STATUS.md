@@ -16,7 +16,7 @@ python tools/generate_workspace_status.py
 - Git readiness audit: passing.
 - Workspace baseline recommendation: available in `outputs/first_commit_recommendation.md`.
 - Git candidate files: 61.
-- Git candidate size: about 0.14 MB.
+- Git candidate size: about 0.15 MB.
 - Recommended baseline files: 61.
 - Manual confirmation items for baseline review: 0.
 - Confirmed public/site assets included: 0.

@@ -285,6 +285,26 @@ python tools/audit_line_endings.py --strict
 python tools/audit_line_endings.py --fix
 ```
 
+### `tools/test_workspace_tools.py`
+
+这是 workspace 工具的轻量回归测试脚本。
+
+用法：
+
+```bash
+python tools/test_workspace_tools.py
+```
+
+### `tools/summarize_git_candidates.py`
+
+这是 Git 候选文件摘要脚本。
+
+用法：
+
+```bash
+python tools/summarize_git_candidates.py
+```
+
 ### `tools/prepare_baseline_report.py`
 
 这是 workspace baseline 推荐报告生成脚本。
@@ -312,6 +332,26 @@ python tools/verify_baseline_report.py
 ```
 
 它会比较当前候选文件和已生成报告，提醒是否需要重新生成。
+
+### `tools/generate_workspace_status.py`
+
+这是 workspace 当前状态文件生成脚本。
+
+用法：
+
+```bash
+python tools/generate_workspace_status.py
+```
+
+### `tools/verify_workspace_status.py`
+
+这是 workspace 状态文件新鲜度验证脚本。
+
+用法：
+
+```bash
+python tools/verify_workspace_status.py
+```
 
 ### `tools/run_workspace_maintenance.py`
 
