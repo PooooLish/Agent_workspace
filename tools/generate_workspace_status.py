@@ -80,7 +80,7 @@ def build_status(root: Path) -> str:
 
     report_path = root / "outputs" / "first_commit_recommendation.md"
     report_text = report_path.read_text(encoding="utf-8") if report_path.exists() else ""
-    recommended = extract_int(r"Recommended for baseline commit: (\d+)", report_text)
+    recommended = extract_int(r"Recommended baseline files: (\d+)", report_text)
     manual = extract_int(r"Needs manual confirmation: (\d+)", report_text)
     confirmed_assets = extract_int(r"Confirmed public/site assets included: (\d+)", report_text)
 
@@ -117,11 +117,11 @@ def build_status(root: Path) -> str:
         "",
         f"- Structure check: {check_status}.",
         f"- Git readiness audit: {audit_status}.",
-        f"- First-commit recommendation: {report_status} in `outputs/first_commit_recommendation.md`.",
+        f"- Workspace baseline recommendation: {report_status} in `outputs/first_commit_recommendation.md`.",
         f"- Git candidate files: {len(files)}.",
         f"- Git candidate size: about {total_size:.2f} MB.",
         f"- Recommended baseline files: {recommended}.",
-        f"- Manual confirmation items for first commit: {manual}.",
+        f"- Manual confirmation items for baseline review: {manual}.",
         f"- Confirmed public/site assets included: {confirmed_assets}.",
         f"- Line ending drift reminders: {line_ending_drift}.",
         f"- Strict 1 MB large-file reminders: {strict_large}.",
@@ -141,7 +141,7 @@ def build_status(root: Path) -> str:
         "python tools/run_workspace_maintenance.py",
         "```",
         "",
-        "Use stricter large-file review when preparing a careful first commit:",
+        "Use stricter large-file review when preparing a careful baseline or broad structural commit:",
         "",
         "```powershell",
         "python tools/audit_git_readiness.py --max-mb 1",
@@ -155,8 +155,8 @@ def build_status(root: Path) -> str:
         "- `tools/audit_line_endings.py`: reports line ending drift against `.gitattributes` policy.",
         "- `tools/test_workspace_tools.py`: runs lightweight regression tests for workspace tools.",
         "- `tools/summarize_git_candidates.py`: summarizes Git candidates by area, extension, and largest files.",
-        "- `tools/prepare_first_commit_report.py`: writes the first-commit recommendation report.",
-        "- `tools/verify_first_commit_report.py`: verifies that the first-commit recommendation matches current Git candidates.",
+        "- `tools/prepare_first_commit_report.py`: writes the workspace baseline recommendation report.",
+        "- `tools/verify_first_commit_report.py`: verifies that the baseline recommendation matches current Git candidates.",
         "- `tools/generate_workspace_status.py`: regenerates this current-state summary.",
         "- `tools/verify_workspace_status.py`: verifies that `WORKSPACE_STATUS.md` matches the current generated status.",
         "- `tools/run_workspace_maintenance.py`: runs the full maintenance chain.",
@@ -179,7 +179,7 @@ def build_status(root: Path) -> str:
         "",
         "## Git Baseline Notes",
         "",
-        f"The current first-commit recommendation treats all {recommended} recommended files as baseline candidates.",
+        f"The current baseline recommendation treats all {recommended} recommended files as baseline candidates.",
         "",
         "Repository normalization is governed by `.gitattributes`:",
         "",

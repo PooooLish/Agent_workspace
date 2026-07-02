@@ -105,7 +105,7 @@ def build_report(root: Path, files: list[Path]) -> str:
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     lines: list[str] = [
-        "# First Commit Recommendation",
+        "# Workspace Baseline Recommendation",
         "",
         f"Generated: {now}",
         "",
@@ -113,11 +113,11 @@ def build_report(root: Path, files: list[Path]) -> str:
         "",
         f"- Git candidate files: {len(files)}",
         f"- Total candidate size: {total_size:.2f} MB",
-        f"- Recommended for baseline commit: {len(recommended)}",
+        f"- Recommended baseline files: {len(recommended)}",
         f"- Needs manual confirmation: {len(review)}",
         f"- Confirmed public/site assets included: {len(confirmed_assets)}",
         "",
-        "## Recommended Baseline Commit",
+        "## Recommended Baseline Files",
         "",
         "These files look like source, rules, docs, prompts, SOPs, templates, or small project files.",
         "",
@@ -183,7 +183,7 @@ def build_report(root: Path, files: list[Path]) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Create a Markdown recommendation for the first workspace commit.")
+    parser = argparse.ArgumentParser(description="Create a Markdown recommendation for the workspace baseline.")
     parser.add_argument("--output", default="outputs/first_commit_recommendation.md", help="Report path relative to the workspace root.")
     args = parser.parse_args()
 

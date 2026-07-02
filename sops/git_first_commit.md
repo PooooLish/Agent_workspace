@@ -1,6 +1,6 @@
 # Git First Commit SOP
 
-Use this SOP before creating the first workspace commit or any broad structural commit.
+Use this SOP before creating the first workspace commit or any later broad structural commit.
 
 ## Procedure
 
@@ -29,7 +29,7 @@ End with:
 
 - candidate file count
 - readiness audit result
-- first commit recommendation path
+- baseline recommendation path
 - notable large files, if any
 - files or directories intentionally excluded
 - remaining private task or cleanup items

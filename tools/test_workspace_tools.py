@@ -235,7 +235,7 @@ class FirstCommitVerificationTests(unittest.TestCase):
         generator = self.verify_report.load_report_generator(ROOT)
         report = generator.build_report(ROOT, generator.candidate_files(ROOT))
 
-        self.assertIn("# First Commit Recommendation", report)
+        self.assertIn("# Workspace Baseline Recommendation", report)
         self.assertIn("## Summary", report)
 
 

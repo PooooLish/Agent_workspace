@@ -14,11 +14,11 @@ python tools/generate_workspace_status.py
 
 - Structure check: passing.
 - Git readiness audit: passing.
-- First-commit recommendation: available in `outputs/first_commit_recommendation.md`.
+- Workspace baseline recommendation: available in `outputs/first_commit_recommendation.md`.
 - Git candidate files: 59.
 - Git candidate size: about 0.14 MB.
 - Recommended baseline files: 59.
-- Manual confirmation items for first commit: 0.
+- Manual confirmation items for baseline review: 0.
 - Confirmed public/site assets included: 0.
 - Line ending drift reminders: 0.
 - Strict 1 MB large-file reminders: 0.
@@ -38,7 +38,7 @@ python tools/verify_workspace_status.py
 python tools/run_workspace_maintenance.py
 ```
 
-Use stricter large-file review when preparing a careful first commit:
+Use stricter large-file review when preparing a careful baseline or broad structural commit:
 
 ```powershell
 python tools/audit_git_readiness.py --max-mb 1
@@ -52,8 +52,8 @@ python tools/audit_git_readiness.py --max-mb 1
 - `tools/audit_line_endings.py`: reports line ending drift against `.gitattributes` policy.
 - `tools/test_workspace_tools.py`: runs lightweight regression tests for workspace tools.
 - `tools/summarize_git_candidates.py`: summarizes Git candidates by area, extension, and largest files.
-- `tools/prepare_first_commit_report.py`: writes the first-commit recommendation report.
-- `tools/verify_first_commit_report.py`: verifies that the first-commit recommendation matches current Git candidates.
+- `tools/prepare_first_commit_report.py`: writes the workspace baseline recommendation report.
+- `tools/verify_first_commit_report.py`: verifies that the baseline recommendation matches current Git candidates.
 - `tools/generate_workspace_status.py`: regenerates this current-state summary.
 - `tools/verify_workspace_status.py`: verifies that `WORKSPACE_STATUS.md` matches the current generated status.
 - `tools/run_workspace_maintenance.py`: runs the full maintenance chain.
@@ -105,7 +105,7 @@ python tools/audit_git_readiness.py --max-mb 1
 
 ## Git Baseline Notes
 
-The current first-commit recommendation treats all 59 recommended files as baseline candidates.
+The current baseline recommendation treats all 59 recommended files as baseline candidates.
 
 Repository normalization is governed by `.gitattributes`:
 

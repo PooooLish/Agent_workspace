@@ -111,12 +111,12 @@ It records:
 
 - latest health-check status
 - Git readiness status
-- first-commit recommendation summary
+- workspace baseline recommendation summary
 - key maintenance commands
 - ignored/generated report notes
 - task privacy and Git baseline notes
 
-Regenerate it with `python tools/generate_workspace_status.py` after broad workspace maintenance, before or after the first commit, or whenever the workspace operating model changes materially.
+Regenerate it with `python tools/generate_workspace_status.py` after broad workspace maintenance, before or after broad structural commits, or whenever the workspace operating model changes materially.
 
 ### `.git/`
 
@@ -288,7 +288,7 @@ Usage:
 python tools/audit_git_readiness.py
 ```
 
-Use a stricter threshold when preparing a careful first commit:
+Use a stricter threshold when preparing a careful baseline or broad structural commit:
 
 ```bash
 python tools/audit_git_readiness.py --max-mb 1
@@ -306,7 +306,7 @@ Important behavior:
 - it reports paths and pattern names, not secret values
 - it exits with code `2` when it finds review-worthy issues
 
-Run it before the first commit and before any later commit that touches broad workspace structure.
+Run it before any commit that touches broad workspace structure.
 
 ### `tools/summarize_git_candidates.py`
 
@@ -372,7 +372,7 @@ Usage:
 python tools/generate_workspace_status.py
 ```
 
-It runs the workspace check, Git readiness audit, first-commit report generation, and strict large-file reminder, then writes the current-state summary.
+It runs the workspace check, Git readiness audit, baseline report generation, and strict large-file reminder, then writes the current-state summary.
 
 ### `tools/run_workspace_maintenance.py`
 
@@ -382,7 +382,7 @@ This script runs the standard maintenance chain in order:
 - tool regression tests
 - Git readiness audit
 - Git candidate summary
-- first-commit report generation
+- baseline report generation
 - workspace status regeneration
 - strict 1 MB large-file reminder
 
@@ -665,7 +665,7 @@ Summarize Git candidates:
 python tools/summarize_git_candidates.py
 ```
 
-Prepare first commit report:
+Prepare baseline report:
 
 ```bash
 python tools/prepare_first_commit_report.py

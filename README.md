@@ -51,9 +51,9 @@ python tools/run_workspace_maintenance.py
 
 The readiness audit reports large Git candidates, sensitive-looking file names, and secret-like content without printing secret values.
 Use `python tools/audit_git_readiness.py --max-mb 1` for a stricter large-file review.
-The first-commit report is written to `outputs/first_commit_recommendation.md`.
+The baseline recommendation report is written to `outputs/first_commit_recommendation.md`.
 The workspace status summary is regenerated in `WORKSPACE_STATUS.md`.
-For a first commit, follow `sops/git_first_commit.md`.
+For the first commit or any broad structural commit, follow `sops/git_first_commit.md`.
 For routine workspace upkeep, follow `sops/workspace_maintenance.md`.
 
 ## Notes for Chinese docs on Windows
