@@ -10,6 +10,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+CORE_MAINTENANCE_COMMANDS = [
+    "python tools/check_workspace.py",
+    "python tools/audit_git_readiness.py",
+    "python tools/audit_line_endings.py --strict",
+    "python tools/test_workspace_tools.py",
+    "python tools/summarize_git_candidates.py",
+    "python tools/prepare_baseline_report.py",
+    "python tools/verify_baseline_report.py",
+    "python tools/generate_workspace_status.py",
+    "python tools/verify_workspace_status.py",
+    "python tools/run_workspace_maintenance.py",
+]
+
 
 def load_tool(name: str):
     path = ROOT / "tools" / f"{name}.py"
@@ -180,6 +193,17 @@ class CheckWorkspaceTests(unittest.TestCase):
             with self.subTest(relative_path=relative_path):
                 self.assertIn(relative_path, required_items)
                 self.assertIn(relative_path, status_text)
+
+    def test_core_maintenance_commands_are_in_readmes(self) -> None:
+        readme_texts = {
+            "README.md": (ROOT / "README.md").read_text(encoding="utf-8"),
+            "README.zh-CN.md": (ROOT / "README.zh-CN.md").read_text(encoding="utf-8"),
+        }
+
+        for filename, text in readme_texts.items():
+            for command in CORE_MAINTENANCE_COMMANDS:
+                with self.subTest(filename=filename, command=command):
+                    self.assertIn(command, text)
 
     def test_ignored_private_task_index_is_inactive(self) -> None:
         self.assertFalse(self.check_workspace.private_task_index_is_active(ROOT))
