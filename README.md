@@ -39,7 +39,7 @@ python tools/check_workspace.py
 python tools/audit_git_readiness.py
 python tools/test_workspace_tools.py
 python tools/summarize_git_candidates.py
-python tools/prepare_first_commit_report.py
+python tools/prepare_baseline_report.py
 python tools/generate_workspace_status.py
 ```
 

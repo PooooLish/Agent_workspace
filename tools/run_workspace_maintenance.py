@@ -15,12 +15,13 @@ class Step:
 
 
 STEPS = [
+    Step("workspace status bootstrap", ["python", "tools/generate_workspace_status.py"]),
     Step("tool regression tests", ["python", "tools/test_workspace_tools.py"]),
     Step("workspace structure", ["python", "tools/check_workspace.py"]),
     Step("git readiness", ["python", "tools/audit_git_readiness.py"]),
     Step("git candidate summary", ["python", "tools/summarize_git_candidates.py", "--top", "8"]),
-    Step("baseline report", ["python", "tools/prepare_first_commit_report.py"]),
-    Step("baseline report freshness", ["python", "tools/verify_first_commit_report.py"]),
+    Step("baseline report", ["python", "tools/prepare_baseline_report.py"]),
+    Step("baseline report freshness", ["python", "tools/verify_baseline_report.py"]),
     Step("workspace status", ["python", "tools/generate_workspace_status.py"]),
     Step("workspace status freshness", ["python", "tools/verify_workspace_status.py"]),
     Step("line ending audit", ["python", "tools/audit_line_endings.py"]),

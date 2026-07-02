@@ -340,14 +340,14 @@ python tools/test_workspace_tools.py
 
 It uses only the Python standard library and avoids creating files except through explicit dry-run checks.
 
-### `tools/prepare_first_commit_report.py`
+### `tools/prepare_baseline_report.py`
 
-This script writes a Markdown recommendation for the first workspace commit.
+This script writes a Markdown recommendation for the current workspace baseline.
 
 Usage:
 
 ```bash
-python tools/prepare_first_commit_report.py
+python tools/prepare_baseline_report.py
 ```
 
 Default output:
@@ -361,6 +361,8 @@ What it does:
 - includes the verification commands to rerun before staging
 
 The output lives in `outputs/`, so it is intentionally not tracked by Git unless explicitly moved.
+
+The older `tools/prepare_first_commit_report.py` command remains available for compatibility.
 
 ### `tools/generate_workspace_status.py`
 
@@ -668,7 +670,7 @@ python tools/summarize_git_candidates.py
 Prepare baseline report:
 
 ```bash
-python tools/prepare_first_commit_report.py
+python tools/prepare_baseline_report.py
 ```
 
 Regenerate workspace status:

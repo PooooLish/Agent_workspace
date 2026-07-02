@@ -224,7 +224,7 @@ class WorkspaceStatusTests(unittest.TestCase):
 class FirstCommitVerificationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.verify_report = load_tool("verify_first_commit_report")
+        cls.verify_report = load_tool("verify_baseline_report")
 
     def test_normalize_generated_line(self) -> None:
         original = "# Report\n\nGenerated: 2026-07-02 10:00:00\n\nBody"
@@ -242,7 +242,7 @@ class FirstCommitVerificationTests(unittest.TestCase):
 class FirstCommitReportTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.report = load_tool("prepare_first_commit_report")
+        cls.report = load_tool("prepare_baseline_report").load_legacy_report_tool(ROOT)
 
     def test_confirmed_public_assets(self) -> None:
         self.assertFalse(self.report.is_confirmed_asset("tasks/private_example/docs/public/logo.png"))

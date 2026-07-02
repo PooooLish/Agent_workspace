@@ -21,6 +21,8 @@ EXCLUDE_NOTES = [
     ("**/node_modules/", "Dependency folders are ignored by policy."),
 ]
 
+DEFAULT_OUTPUT = "outputs/first_commit_recommendation.md"
+
 
 def run_git(root: Path, args: list[str]) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
@@ -184,7 +186,7 @@ def build_report(root: Path, files: list[Path]) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Create a Markdown recommendation for the workspace baseline.")
-    parser.add_argument("--output", default="outputs/first_commit_recommendation.md", help="Report path relative to the workspace root.")
+    parser.add_argument("--output", default=DEFAULT_OUTPUT, help="Report path relative to the workspace root.")
     args = parser.parse_args()
 
     root = Path(__file__).resolve().parents[1]
