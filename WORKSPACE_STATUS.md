@@ -47,7 +47,7 @@ python tools/audit_git_readiness.py --max-mb 1
 ## Current Tools
 
 - `tools/make_task.py`: creates isolated task folders with safe defaults and `--dry-run`.
-- `tools/check_workspace.py`: checks required workspace structure, task baseline files, task index coverage and quality, tool/skill/SOP/prompt/environment registry coverage, Git ignore behavior, and UTF-8 text readability.
+- `tools/check_workspace.py`: checks required workspace structure, deliberately trackable optional task index quality, tool/skill/SOP/prompt/environment registry coverage, Git ignore behavior, and UTF-8 text readability.
 - `tools/audit_git_readiness.py`: checks Git candidates for large files, sensitive names, and secret-like content.
 - `tools/audit_line_endings.py`: reports line ending drift against `.gitattributes` policy.
 - `tools/test_workspace_tools.py`: runs lightweight regression tests for workspace tools.

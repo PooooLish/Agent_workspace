@@ -109,6 +109,8 @@ REQUIRED_TASK_ITEMS = [
     "docs/skills",
 ]
 
+OPTIONAL_PRIVATE_TASK_INDEX = "tasks/INDEX.md"
+
 TASK_INDEX_ROW_RE = re.compile(r"^\|\s*`([^`]+)`\s*\|", re.MULTILINE)
 TASK_INDEX_SECTION_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
 
@@ -315,14 +317,19 @@ def task_name_from_cell(cell: str) -> str:
     return match.group(1) if match else ""
 
 
-def check_task_index_quality(root: Path, index_text: str, task_dirs: set[str], warnings: list[str]) -> None:
+def private_task_index_is_active(root: Path) -> bool:
+    index_path = root / OPTIONAL_PRIVATE_TASK_INDEX
+    return index_path.exists() and not is_git_ignored(root, OPTIONAL_PRIVATE_TASK_INDEX)
+
+
+def check_private_task_index_quality(root: Path, index_text: str, task_dirs: set[str], warnings: list[str]) -> None:
     current_rows = parse_task_table(get_markdown_section(index_text, "Current Tasks"))
     cleanup_rows = parse_task_table(get_markdown_section(index_text, "Pending Cleanup"))
 
     if not current_rows:
-        warnings.append("tasks/INDEX.md has no Current Tasks rows")
+        warnings.append(f"{OPTIONAL_PRIVATE_TASK_INDEX} has no Current Tasks rows")
     if not cleanup_rows:
-        warnings.append("tasks/INDEX.md has no Pending Cleanup rows")
+        warnings.append(f"{OPTIONAL_PRIVATE_TASK_INDEX} has no Pending Cleanup rows")
 
     seen: set[str] = set()
     current_tasks: set[str] = set()
@@ -334,10 +341,10 @@ def check_task_index_quality(root: Path, index_text: str, task_dirs: set[str], w
             continue
         current_tasks.add(task_name)
         if task_name in seen:
-            warnings.append(f"tasks/INDEX.md lists {task_name} more than once")
+            warnings.append(f"{OPTIONAL_PRIVATE_TASK_INDEX} lists {task_name} more than once")
         seen.add(task_name)
         if len(row) < 3 or not row[1] or not row[2]:
-            warnings.append(f"tasks/INDEX.md current task {task_name} needs status and notes")
+            warnings.append(f"{OPTIONAL_PRIVATE_TASK_INDEX} current task {task_name} needs status and notes")
 
     for row in cleanup_rows:
         task_name = task_name_from_cell(row[0]) if row else ""
@@ -345,18 +352,18 @@ def check_task_index_quality(root: Path, index_text: str, task_dirs: set[str], w
             continue
         cleanup_tasks.add(task_name)
         if task_name in seen:
-            warnings.append(f"tasks/INDEX.md lists {task_name} more than once")
+            warnings.append(f"{OPTIONAL_PRIVATE_TASK_INDEX} lists {task_name} more than once")
         seen.add(task_name)
         if len(row) < 2 or not row[1]:
-            warnings.append(f"tasks/INDEX.md cleanup task {task_name} needs a reason")
+            warnings.append(f"{OPTIONAL_PRIVATE_TASK_INDEX} cleanup task {task_name} needs a reason")
         if task_name in task_dirs and not is_git_ignored(root, f"tasks/{task_name}/AGENTS.md"):
-            warnings.append(f"tasks/INDEX.md cleanup task {task_name} should be ignored by Git")
+            warnings.append(f"{OPTIONAL_PRIVATE_TASK_INDEX} cleanup task {task_name} should be ignored by Git")
 
     indexed_tasks = current_tasks | cleanup_tasks
     for task_name in sorted(task_dirs - indexed_tasks):
-        warnings.append(f"tasks/{task_name} is not listed in tasks/INDEX.md")
+        warnings.append(f"tasks/{task_name} is not listed in {OPTIONAL_PRIVATE_TASK_INDEX}")
     for task_name in sorted(indexed_tasks - task_dirs):
-        warnings.append(f"tasks/INDEX.md lists missing task directory: {task_name}")
+        warnings.append(f"{OPTIONAL_PRIVATE_TASK_INDEX} lists missing task directory: {task_name}")
 
 
 def check_utf8_text_files(root: Path, warnings: list[str]) -> None:
@@ -425,15 +432,15 @@ def main() -> int:
                 if not (task_dir / item).exists():
                     warnings.append(f"tasks/{task_dir.name} missing recommended item: {item}")
 
-        index_path = tasks_root / "INDEX.md"
-        if index_path.exists() and not is_git_ignored(root, "tasks/INDEX.md"):
+        index_path = root / OPTIONAL_PRIVATE_TASK_INDEX
+        if private_task_index_is_active(root):
             index_text = index_path.read_text(encoding="utf-8")
             task_dirs = {
                 path.name
                 for path in tasks_root.iterdir()
                 if path.is_dir() and not is_git_ignored(root, f"tasks/{path.name}/AGENTS.md")
             }
-            check_task_index_quality(root, index_text, task_dirs, warnings)
+            check_private_task_index_quality(root, index_text, task_dirs, warnings)
 
     check_required_ignored_paths(root, warnings)
     check_tool_registry(root, warnings)

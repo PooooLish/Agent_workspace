@@ -181,9 +181,12 @@ class CheckWorkspaceTests(unittest.TestCase):
                 self.assertIn(relative_path, required_items)
                 self.assertIn(relative_path, status_text)
 
-    def test_task_index_quality_inputs(self) -> None:
-        index_path = ROOT / "tasks" / "INDEX.md"
-        if not index_path.exists() or self.check_workspace.is_git_ignored(ROOT, "tasks/INDEX.md"):
+    def test_ignored_private_task_index_is_inactive(self) -> None:
+        self.assertFalse(self.check_workspace.private_task_index_is_active(ROOT))
+
+    def test_private_task_index_quality_inputs(self) -> None:
+        index_path = ROOT / self.check_workspace.OPTIONAL_PRIVATE_TASK_INDEX
+        if not self.check_workspace.private_task_index_is_active(ROOT):
             return
 
         index_text = index_path.read_text(encoding="utf-8")
