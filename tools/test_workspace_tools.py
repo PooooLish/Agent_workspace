@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import importlib.util
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -81,6 +82,20 @@ class LineEndingAuditTests(unittest.TestCase):
         self.assertEqual(self.audit.expected_line_ending("tools/check_workspace.py"), "lf")
         self.assertEqual(self.audit.expected_line_ending("scripts/build.ps1"), "crlf")
         self.assertIsNone(self.audit.expected_line_ending("tasks/private_example/assets/logo.png"))
+
+    def test_normalize_line_endings(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            lf_path = root / "README.md"
+            crlf_path = root / "script.ps1"
+            lf_path.write_bytes(b"one\r\ntwo\r\n")
+            crlf_path.write_bytes(b"one\ntwo\n")
+
+            changed = self.audit.normalize_line_endings(root, ["README.md"], ["script.ps1"])
+
+            self.assertEqual(changed, 2)
+            self.assertEqual(lf_path.read_bytes(), b"one\ntwo\n")
+            self.assertEqual(crlf_path.read_bytes(), b"one\r\ntwo\r\n")
 
 
 class CheckWorkspaceTests(unittest.TestCase):

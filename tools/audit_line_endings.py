@@ -85,6 +85,29 @@ def audit_line_endings(root: Path) -> tuple[list[str], list[str]]:
     return lf_policy_with_crlf, crlf_policy_without_crlf
 
 
+def normalize_line_endings(root: Path, lf_paths: list[str], crlf_paths: list[str]) -> int:
+    changed = 0
+
+    for relative_path in lf_paths:
+        path = root / relative_path
+        data = path.read_bytes()
+        normalized = data.replace(b"\r\n", b"\n")
+        if normalized != data:
+            path.write_bytes(normalized)
+            changed += 1
+
+    for relative_path in crlf_paths:
+        path = root / relative_path
+        data = path.read_bytes()
+        text = data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        normalized = text.replace(b"\n", b"\r\n")
+        if normalized != data:
+            path.write_bytes(normalized)
+            changed += 1
+
+    return changed
+
+
 def print_examples(title: str, paths: list[str], limit: int) -> None:
     print(f"{title}: {len(paths)}")
     for path in paths[:limit]:
@@ -96,11 +119,17 @@ def print_examples(title: str, paths: list[str], limit: int) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Audit Git candidate line endings against .gitattributes policy.")
     parser.add_argument("--strict", action="store_true", help="Return nonzero when drift is found.")
+    parser.add_argument("--fix", action="store_true", help="Rewrite drifted candidate files to their expected line endings.")
     parser.add_argument("--examples", type=int, default=12, help="Maximum example paths to print per category.")
     args = parser.parse_args()
 
     root = Path(__file__).resolve().parents[1]
     lf_policy_with_crlf, crlf_policy_without_crlf = audit_line_endings(root)
+
+    if args.fix:
+        changed = normalize_line_endings(root, lf_policy_with_crlf, crlf_policy_without_crlf)
+        print(f"Normalized line endings in {changed} file(s).")
+        lf_policy_with_crlf, crlf_policy_without_crlf = audit_line_endings(root)
 
     print_examples("LF-policy candidate files containing CRLF", lf_policy_with_crlf, args.examples)
     print_examples("CRLF-policy candidate files without CRLF", crlf_policy_without_crlf, args.examples)

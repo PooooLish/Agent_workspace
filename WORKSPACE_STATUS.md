@@ -20,7 +20,7 @@ python tools/generate_workspace_status.py
 - Recommended baseline files: 59.
 - Manual confirmation items for first commit: 0.
 - Confirmed public/site assets included: 0.
-- Line ending drift reminders: 31.
+- Line ending drift reminders: 0.
 - Strict 1 MB large-file reminders: 0.
 
 ## Core Commands
