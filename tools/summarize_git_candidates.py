@@ -42,7 +42,9 @@ def top_bucket(relative_path: str) -> str:
     parts = relative_path.split("/")
     if len(parts) == 1:
         return "<root>"
-    if parts[0] == "tasks" and len(parts) >= 2:
+    if parts[0] == "tasks":
+        if len(parts) == 2 and parts[1] == "README.md":
+            return "tasks"
         return f"tasks/{parts[1]}"
     return parts[0]
 

@@ -87,7 +87,8 @@ def build_status(root: Path) -> str:
     strict_large = extract_int(r"Summary: (\d+) large file\(s\)", strict_audit.stdout)
     line_ending_drift = extract_int(r"Summary: (\d+) line ending drift reminder\(s\)", line_endings.stdout)
 
-    cleanup_ignored = is_ignored(root, "tasks/good_task-name_123/AGENTS.md")
+    task_folder_ignored = is_ignored(root, "tasks/private_example/AGENTS.md")
+    task_placeholder_ignored = is_ignored(root, "tasks/README.md")
     report_ignored = is_ignored(root, "outputs/first_commit_recommendation.md")
 
     check_status = "passing" if check.returncode == 0 else f"failing with exit code {check.returncode}"
@@ -194,21 +195,14 @@ def build_status(root: Path) -> str:
         "- raw video media and selected source media",
         "- local backup files such as `*.bak`",
         "- local Playwright CLI artifacts",
-        "- temporary verification task `tasks/good_task-name_123/`",
+        "- concrete task folders under `tasks/*`",
         "",
-        "## Confirmed Public/Site Assets",
+        "## Task Privacy",
         "",
-        "These `llm_101` public assets are intentionally included in the baseline recommendation:",
-        "",
-        "- `tasks/llm_101/docs/public/content-index.json`",
-        "- `tasks/llm_101/docs/public/hero-banner.png`",
-        "- `tasks/llm_101/docs/public/logo.png`",
-        "",
-        "## Pending Cleanup",
-        "",
-        "- `tasks/good_task-name_123/` is a temporary verification task created during tool testing.",
-        f"- It is ignored by Git: {'yes' if cleanup_ignored else 'no'}.",
-        "- Delete it only after explicit user approval.",
+        "- Concrete task folders are local-private by default.",
+        f"- Example concrete task path ignored by Git: {'yes' if task_folder_ignored else 'no'}.",
+        f"- `tasks/README.md` remains trackable: {'yes' if not task_placeholder_ignored else 'no'}.",
+        "- Publish task files only after deliberate review and a narrow ignore-rule exception.",
         "",
         "## Ignored Generated Reports",
         "",
@@ -216,8 +210,8 @@ def build_status(root: Path) -> str:
         "",
         "## Next Reasonable Actions",
         "",
-        "1. Ask for explicit approval if cleanup of `tasks/good_task-name_123/` is desired.",
-        "2. Review `outputs/first_commit_recommendation.md`.",
+        "1. Review `outputs/first_commit_recommendation.md` before broad commits.",
+        "2. Confirm `git ls-files tasks` contains only intended public task placeholders.",
         "3. Stage and commit only after the checks above pass.",
         "4. Regenerate this file after broad workspace maintenance.",
         "",

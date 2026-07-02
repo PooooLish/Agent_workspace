@@ -80,7 +80,7 @@ class LineEndingAuditTests(unittest.TestCase):
         self.assertEqual(self.audit.expected_line_ending("README.md"), "lf")
         self.assertEqual(self.audit.expected_line_ending("tools/check_workspace.py"), "lf")
         self.assertEqual(self.audit.expected_line_ending("scripts/build.ps1"), "crlf")
-        self.assertIsNone(self.audit.expected_line_ending("tasks/llm_101/docs/public/logo.png"))
+        self.assertIsNone(self.audit.expected_line_ending("tasks/private_example/assets/logo.png"))
 
 
 class CheckWorkspaceTests(unittest.TestCase):
@@ -92,7 +92,7 @@ class CheckWorkspaceTests(unittest.TestCase):
         self.assertTrue(self.check_workspace.is_utf8_candidate("README.zh-CN.md"))
         self.assertTrue(self.check_workspace.is_utf8_candidate("tools/check_workspace.py"))
         self.assertTrue(self.check_workspace.is_utf8_candidate(".gitattributes"))
-        self.assertFalse(self.check_workspace.is_utf8_candidate("tasks/llm_101/docs/public/logo.png"))
+        self.assertFalse(self.check_workspace.is_utf8_candidate("tasks/private_example/assets/logo.png"))
         self.assertFalse(self.check_workspace.is_utf8_candidate("archives/sample.zip"))
 
     def test_required_ignored_paths_are_ignored(self) -> None:
@@ -101,7 +101,7 @@ class CheckWorkspaceTests(unittest.TestCase):
                 self.assertTrue(self.check_workspace.is_git_ignored(ROOT, relative_path))
 
     def test_task_folders_are_private_by_default(self) -> None:
-        self.assertTrue(self.check_workspace.is_git_ignored(ROOT, "tasks/example_python_demo/AGENTS.md"))
+        self.assertTrue(self.check_workspace.is_git_ignored(ROOT, "tasks/private_example/AGENTS.md"))
         self.assertFalse(self.check_workspace.is_git_ignored(ROOT, "tasks/README.md"))
 
     def test_tool_scripts_are_registered_and_documented(self) -> None:
@@ -182,9 +182,12 @@ class CheckWorkspaceTests(unittest.TestCase):
         current_tasks = {self.check_workspace.task_name_from_cell(row[0]) for row in current_rows}
         cleanup_tasks = {self.check_workspace.task_name_from_cell(row[0]) for row in cleanup_rows}
 
-        self.assertIn("llm_101", current_tasks)
-        self.assertIn("good_task-name_123", cleanup_tasks)
-        self.assertTrue(self.check_workspace.is_git_ignored(ROOT, "tasks/good_task-name_123/AGENTS.md"))
+        for task_name in current_tasks:
+            with self.subTest(task_name=task_name):
+                self.assertTrue((ROOT / "tasks" / task_name).is_dir())
+        for task_name in cleanup_tasks:
+            with self.subTest(task_name=task_name):
+                self.assertTrue(self.check_workspace.is_git_ignored(ROOT, f"tasks/{task_name}/AGENTS.md"))
 
 
 class WorkspaceStatusTests(unittest.TestCase):
@@ -224,13 +227,13 @@ class FirstCommitReportTests(unittest.TestCase):
         cls.report = load_tool("prepare_first_commit_report")
 
     def test_confirmed_public_assets(self) -> None:
-        self.assertTrue(self.report.is_confirmed_asset("tasks/llm_101/docs/public/logo.png"))
-        self.assertTrue(self.report.is_confirmed_asset("tasks/llm_101/docs/public/content-index.json"))
-        self.assertFalse(self.report.is_confirmed_asset("tasks/llm_101/package.json"))
+        self.assertFalse(self.report.is_confirmed_asset("tasks/private_example/docs/public/logo.png"))
+        self.assertFalse(self.report.is_confirmed_asset("tasks/private_example/docs/public/content-index.json"))
+        self.assertFalse(self.report.is_confirmed_asset("tasks/private_example/package.json"))
 
     def test_no_current_review_suffixes(self) -> None:
         self.assertFalse(self.report.needs_review("envs/opencode.md"))
-        self.assertFalse(self.report.needs_review("tasks/llm_101/docs/public/logo.png"))
+        self.assertFalse(self.report.needs_review("tasks/private_example/docs/public/logo.png"))
 
 
 if __name__ == "__main__":

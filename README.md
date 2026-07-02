@@ -12,8 +12,8 @@ This workspace is a personal, reusable home for learning and using Codex, Claude
 - `tools/`: small helper scripts for task creation and workspace checks.
 - `envs/`: environment notes and setup templates.
 - `WORKSPACE_STATUS.md`: latest health, audit, and commit-readiness status.
-- `tasks/`: formal task folders.
-- `tasks/INDEX.md`: lightweight registry of current tasks and cleanup notes.
+- `tasks/`: formal task folders for local work; concrete task folders are ignored by Git by default.
+- `tasks/README.md`: tracked placeholder explaining the private task-folder policy.
 - `sandboxes/`: temporary experiments.
 - `archives/`: completed or abandoned task archives.
 - `secrets/`: templates only, never real secrets.
@@ -28,7 +28,7 @@ python tools/make_task.py my_task_name
 
 This creates `tasks/my_task_name/` with task-level docs, source folders, test folders, output folders, and local ignore rules.
 
-After creating a task, add it to `tasks/INDEX.md`.
+Concrete task folders stay local by default. Keep task status, registries, and cleanup notes inside the task folder unless you deliberately decide to publish them.
 
 ## How to check before committing
 

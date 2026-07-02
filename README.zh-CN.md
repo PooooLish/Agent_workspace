@@ -12,7 +12,8 @@
 - `prompts/`：给不同 agent 直接复用的提示词模板。
 - `tools/`：建任务、检查工作区等辅助脚本。
 - `envs/`：不同 CLI、模型提供方、环境的使用说明。
-- `tasks/`：正式任务目录。
+- `tasks/`：正式任务目录；具体任务文件夹默认只保留在本地，不进入 Git。
+- `tasks/README.md`：被 Git 跟踪的占位说明，用来记录任务目录的私有策略。
 - `sandboxes/`：临时实验目录。
 - `archives/`：已完成或废弃任务的归档目录。
 - `secrets/`：只放模板，不放真实密钥。
@@ -51,6 +52,8 @@ tasks/my_task_name/
 ├── docs/
 └── docs/skills/
 ```
+
+具体任务目录默认被 `.gitignore` 排除。任务状态、登记表和清理说明优先放在任务目录内部，只有确认可以公开复用时再单独加入版本库。
 
 ## 如何在 task 中使用 Codex / Claude Code / OpenCode / Aider
 

@@ -10,7 +10,7 @@ Use this SOP before creating the first workspace commit or any broad structural 
 4. Run `python tools/prepare_first_commit_report.py`.
 5. Review `outputs/first_commit_recommendation.md`.
 6. Confirm that generated outputs, logs, dependency folders, raw media, and local secrets are ignored.
-7. Confirm that pending cleanup items in `tasks/INDEX.md` are either removed with approval or ignored.
+7. Confirm that concrete task folders are ignored and `git ls-files tasks` only shows intended public placeholders.
 8. Stage only the intended baseline files.
 9. Run the checks again after staging if the staged set is broad.
 
@@ -20,7 +20,7 @@ Use this SOP before creating the first workspace commit or any broad structural 
 - Do not stage dependency folders such as `node_modules/`.
 - Do not stage raw media, generated renders, logs, caches, or temporary files unless explicitly intended.
 - Do not stage local backup files such as `*.bak`; keep the canonical file instead.
-- Public site assets may be staged when source code or docs reference them and the readiness audit passes.
+- Task files may be staged only after deliberate review and a narrow ignore-rule exception.
 - Do not delete cleanup candidates without explicit approval.
 
 ## Expected report
@@ -32,4 +32,4 @@ End with:
 - first commit recommendation path
 - notable large files, if any
 - files or directories intentionally excluded
-- remaining cleanup items
+- remaining private task or cleanup items

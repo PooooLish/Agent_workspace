@@ -22,9 +22,6 @@ secrets/*
 **/.vitepress/cache/
 **/coverage/
 
-# Temporary verification artifact; delete only after explicit approval.
-tasks/good_task-name_123/
-
 # Formal task folders and local task registries are private workspace data by default.
 tasks/*
 !tasks/README.md

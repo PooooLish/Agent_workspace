@@ -113,8 +113,8 @@ It records:
 - Git readiness status
 - first-commit recommendation summary
 - key maintenance commands
-- known ignored/deferred items
-- pending cleanup notes
+- ignored/generated report notes
+- task privacy and Git baseline notes
 
 Regenerate it with `python tools/generate_workspace_status.py` after broad workspace maintenance, before or after the first commit, or whenever the workspace operating model changes materially.
 
@@ -495,26 +495,22 @@ Each task should ideally contain:
 - logs
 - docs
 
-### Task index
+### Task privacy
 
-The current task registry lives in:
+Concrete task folders are local-private by default and are ignored by Git through `.gitignore`.
 
-- `tasks/INDEX.md`
+The tracked task placeholder is:
 
-Use it as the lightweight source of truth for active tasks, example tasks, and known cleanup notes.
+- `tasks/README.md`
+
+Use task-local files for active task status, registries, and cleanup notes. Publish a task file only after reviewing it deliberately and adding a narrow Git ignore exception.
 
 When creating a new formal task:
 
 1. Create the task with `python tools/make_task.py <task_name>`.
 2. Fill in `tasks/<task_name>/task.md`.
-3. Add a row to `tasks/INDEX.md`.
-4. Keep task-specific status details inside the task folder.
-
-The example task is still:
-
-- `tasks/example_python_demo/`
-
-Its purpose is to demonstrate the intended structure for a real task and to provide a tiny executable example.
+3. Keep task-specific status details inside the task folder.
+4. Leave the task folder ignored unless you intentionally decide it is safe to publish.
 
 ## 9. Sandboxes and Archives
 
@@ -608,7 +604,7 @@ Currently mature:
 - workspace checking
 - prompt starters
 - baseline OpenCode documentation
-- example task
+- private task-folder policy
 
 Currently lightweight:
 
@@ -640,7 +636,7 @@ Good next improvements would be:
 - add bilingual task templates
 - expand `envs/codex_cli.md`, `envs/claude_code.md`, and `envs/aider.md`
 - add a `summary.md` convention to real tasks
-- keep `tasks/INDEX.md` current as task count grows
+- add a private task registry convention inside task folders or `tasks/` if task volume grows
 - define naming conventions for archives and sandboxes
 
 ## 15. Quick Reference
@@ -711,7 +707,7 @@ This workspace already provides a solid shared operating layer for agent-assiste
 - helper scripts
 - secret-handling policy
 - environment notes
-- a sample task
+- a private task-folder policy
 - OpenCode integration
 
 Its main value is not any single file. Its value comes from how all the parts work together:

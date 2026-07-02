@@ -121,21 +121,14 @@ Important exclusions are governed by `.gitignore`:
 - raw video media and selected source media
 - local backup files such as `*.bak`
 - local Playwright CLI artifacts
-- temporary verification task `tasks/good_task-name_123/`
+- concrete task folders under `tasks/*`
 
-## Confirmed Public/Site Assets
+## Task Privacy
 
-These `llm_101` public assets are intentionally included in the baseline recommendation:
-
-- `tasks/llm_101/docs/public/content-index.json`
-- `tasks/llm_101/docs/public/hero-banner.png`
-- `tasks/llm_101/docs/public/logo.png`
-
-## Pending Cleanup
-
-- `tasks/good_task-name_123/` is a temporary verification task created during tool testing.
-- It is ignored by Git: yes.
-- Delete it only after explicit user approval.
+- Concrete task folders are local-private by default.
+- Example concrete task path ignored by Git: yes.
+- `tasks/README.md` remains trackable: yes.
+- Publish task files only after deliberate review and a narrow ignore-rule exception.
 
 ## Ignored Generated Reports
 
@@ -143,7 +136,7 @@ These `llm_101` public assets are intentionally included in the baseline recomme
 
 ## Next Reasonable Actions
 
-1. Ask for explicit approval if cleanup of `tasks/good_task-name_123/` is desired.
-2. Review `outputs/first_commit_recommendation.md`.
+1. Review `outputs/first_commit_recommendation.md` before broad commits.
+2. Confirm `git ls-files tasks` contains only intended public task placeholders.
 3. Stage and commit only after the checks above pass.
 4. Regenerate this file after broad workspace maintenance.

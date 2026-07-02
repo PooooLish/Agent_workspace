@@ -8,21 +8,17 @@ from datetime import datetime
 from pathlib import Path
 
 
-CONFIRMED_ASSET_PREFIXES = (
-    "tasks/llm_101/docs/public/",
-)
+CONFIRMED_ASSET_PREFIXES: tuple[str, ...] = ()
 
 REVIEW_SUFFIXES: set[str] = set()
 
 EXCLUDE_NOTES = [
-    ("tasks/good_task-name_123/", "Temporary verification task; ignored until explicit deletion approval."),
+    ("tasks/*", "Concrete task folders are local-private by default; only tasks/README.md is tracked."),
     ("*.bak", "Local backup files are ignored; keep canonical docs instead."),
     ("**/outputs/", "Generated outputs are ignored by policy."),
     ("**/tmp/", "Scratch files are ignored by policy."),
     ("**/logs/", "Logs are ignored by policy."),
     ("**/node_modules/", "Dependency folders are ignored by policy."),
-    ("tasks/game_video_highlight_editing/assets/raw_footage/", "Raw media assets are ignored by task policy."),
-    ("tasks/game_video_highlight_editing/assets/selected_sources/", "Selected media sources are ignored by task policy."),
 ]
 
 
@@ -61,7 +57,9 @@ def area(relative_path: str) -> str:
     parts = relative_path.split("/")
     if len(parts) == 1:
         return "<root>"
-    if parts[0] == "tasks" and len(parts) >= 2:
+    if parts[0] == "tasks":
+        if len(parts) == 2 and parts[1] == "README.md":
+            return "tasks"
         return f"tasks/{parts[1]}"
     return parts[0]
 
@@ -176,7 +174,7 @@ def build_report(root: Path, files: list[Path]) -> str:
             "python tools/summarize_git_candidates.py",
             "```",
             "",
-            "Stage files only after reviewing this report and the pending cleanup notes in `tasks/INDEX.md`.",
+            "Stage files only after reviewing this report and confirming no private task content is included.",
             "",
         ]
     )

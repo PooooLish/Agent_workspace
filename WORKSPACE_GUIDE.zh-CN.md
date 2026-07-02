@@ -38,6 +38,7 @@
 - `tools/`
 - `envs/`
 - `tasks/`
+- `tasks/README.md`
 - `sandboxes/`
 - `archives/`
 - `secrets/`
@@ -221,6 +222,8 @@ python tools/make_task.py task_name
 - 再遵守 task 局部规则
 - 局部规则只能补充或收紧全局规则
 
+具体任务目录默认被 `.gitignore` 排除。任务状态、登记表和清理说明优先放在任务目录内部；只有确认内容适合公开和复用时，再添加精确的 Git 例外。
+
 ### `tools/check_workspace.py`
 
 这是检查工作区基础结构是否齐全的脚本。
@@ -324,6 +327,7 @@ python tools/check_workspace.py
 - 一个正式任务，对应 `tasks/` 下的一个独立目录
 - 创建任务的动作应在 workspace 根目录上下文中完成
 - 实际执行某个任务时，应把工作范围收紧到该任务目录
+- 具体任务目录默认只保留在本地，不进入 Git
 
 理想情况下，每个任务应包含：
 
@@ -349,13 +353,13 @@ python tools/check_workspace.py
 
 - `workspace/skills/`
 
-### 当前示例任务：`example_python_demo`
+### 任务目录入库策略
 
-目前工作区里已有一个示例任务：
+Git 默认只跟踪：
 
-- `tasks/example_python_demo/`
+- `tasks/README.md`
 
-它的目的不是完成业务工作，而是演示一个真实任务应该长什么样。
+具体任务目录不默认入库。这样可以降低误提交私人项目上下文、生成产物、媒体文件和本地笔记的风险。需要共享某个任务时，应先人工审查内容，再添加窄范围例外。
 
 ## 9. Sandboxes 与 Archives
 

@@ -91,12 +91,11 @@ REQUIRED_GITATTRIBUTES_PATTERNS = [
 
 REQUIRED_IGNORED_PATHS = [
     "outputs/first_commit_recommendation.md",
-    "tasks/example_python_demo/outputs/generated.txt",
-    "tasks/example_python_demo/tmp/scratch.txt",
-    "tasks/example_python_demo/logs/run.log",
-    "tasks/example_python_demo/node_modules/package/index.js",
-    "tasks/example_python_demo/AGENTS.md",
-    "tasks/good_task-name_123/AGENTS.md",
+    "tasks/private_example/outputs/generated.txt",
+    "tasks/private_example/tmp/scratch.txt",
+    "tasks/private_example/logs/run.log",
+    "tasks/private_example/node_modules/package/index.js",
+    "tasks/private_example/AGENTS.md",
 ]
 
 REQUIRED_TASK_ITEMS = [
