@@ -144,6 +144,7 @@ class CheckWorkspaceTests(unittest.TestCase):
     def test_registry_helper_reports_missing_coverage(self) -> None:
         warnings: list[str] = []
         self.check_workspace.check_registry_paths(
+            ROOT,
             ["tools/not_registered.py"],
             warnings,
             require_items=True,

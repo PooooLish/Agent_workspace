@@ -16,39 +16,10 @@ REQUIRED_ITEMS = [
     ".gitignore",
     "WORKSPACE_STATUS.md",
     "skills",
-    "skills/cli_tool_setup/SKILL.md",
-    "skills/code_review/SKILL.md",
-    "skills/documentation_writer/SKILL.md",
-    "skills/linux_debugging/SKILL.md",
-    "skills/python_project_setup/SKILL.md",
-    "skills/valorant-highlight-editing/SKILL.md",
     "sops",
-    "sops/debug_error.md",
-    "sops/git_first_commit.md",
-    "sops/line_endings.md",
-    "sops/modify_existing_project.md",
-    "sops/new_task.md",
-    "sops/safe_shell_commands.md",
-    "sops/setup_external_api.md",
-    "sops/task_closeout.md",
-    "sops/workspace_maintenance.md",
     "prompts",
-    "prompts/aider_default.md",
-    "prompts/claude_code_default.md",
-    "prompts/code_review.md",
-    "prompts/codex_default.md",
-    "prompts/opencode_default.md",
-    "prompts/safe_debug.md",
-    "prompts/safe_setup.md",
     "tools",
     "envs",
-    "envs/aider.md",
-    "envs/base_python.md",
-    "envs/claude_code.md",
-    "envs/codex_cli.md",
-    "envs/external_api.md",
-    "envs/node_tools.md",
-    "envs/opencode.md",
     "tasks",
     "tasks/README.md",
     "sandboxes",
@@ -176,8 +147,16 @@ def required_items(root: Path) -> list[str]:
     items: list[str] = []
     for item in REQUIRED_ITEMS:
         items.append(item)
+        if item == "skills":
+            items.extend(get_skill_main_paths(root))
+        if item == "sops":
+            items.extend(get_sop_paths(root))
+        if item == "prompts":
+            items.extend(get_prompt_paths(root))
         if item == "tools":
             items.extend(get_tool_script_paths(root))
+        if item == "envs":
+            items.extend(get_env_paths(root))
     return items
 
 
@@ -214,6 +193,7 @@ def workspace_status_text(root: Path) -> str:
 
 
 def check_registry_paths(
+    root: Path,
     paths: list[str],
     warnings: list[str],
     *,
@@ -221,7 +201,6 @@ def check_registry_paths(
     require_status: bool,
     status_text: str,
 ) -> None:
-    root = Path(__file__).resolve().parents[1]
     required_item_set = set(required_items(root))
 
     for relative_path in paths:
@@ -233,6 +212,7 @@ def check_registry_paths(
 
 def check_tool_registry(root: Path, warnings: list[str]) -> None:
     check_registry_paths(
+        root,
         get_tool_script_paths(root),
         warnings,
         require_items=True,
@@ -243,6 +223,7 @@ def check_tool_registry(root: Path, warnings: list[str]) -> None:
 
 def check_sop_registry(root: Path, warnings: list[str]) -> None:
     check_registry_paths(
+        root,
         get_sop_paths(root),
         warnings,
         require_items=True,
@@ -253,6 +234,7 @@ def check_sop_registry(root: Path, warnings: list[str]) -> None:
 
 def check_prompt_registry(root: Path, warnings: list[str]) -> None:
     check_registry_paths(
+        root,
         get_prompt_paths(root),
         warnings,
         require_items=True,
@@ -263,6 +245,7 @@ def check_prompt_registry(root: Path, warnings: list[str]) -> None:
 
 def check_env_registry(root: Path, warnings: list[str]) -> None:
     check_registry_paths(
+        root,
         get_env_paths(root),
         warnings,
         require_items=True,
@@ -274,6 +257,7 @@ def check_env_registry(root: Path, warnings: list[str]) -> None:
 def check_skill_registry(root: Path, warnings: list[str]) -> None:
     status_text = workspace_status_text(root)
     check_registry_paths(
+        root,
         get_skill_main_paths(root),
         warnings,
         require_items=True,
@@ -281,6 +265,7 @@ def check_skill_registry(root: Path, warnings: list[str]) -> None:
         status_text=status_text,
     )
     check_registry_paths(
+        root,
         get_skill_resource_paths(root),
         warnings,
         require_items=False,
