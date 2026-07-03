@@ -255,6 +255,16 @@ class WorkspaceStatusTests(unittest.TestCase):
             with self.subTest(relative_path=relative_path):
                 self.assertIn(f"- `{relative_path}`:", status)
 
+    def test_status_generator_has_tool_descriptions(self) -> None:
+        generator = self.verify_status.load_status_generator(ROOT)
+        described_tools = set(generator.TOOL_DESCRIPTIONS)
+        actual_tools = {
+            str(path.relative_to(ROOT)).replace("\\", "/")
+            for path in (ROOT / "tools").glob("*.py")
+        }
+
+        self.assertEqual(actual_tools, described_tools)
+
 
 class FirstCommitVerificationTests(unittest.TestCase):
     @classmethod
