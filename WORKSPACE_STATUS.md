@@ -15,9 +15,9 @@ python tools/generate_workspace_status.py
 - Structure check: passing.
 - Git readiness audit: passing.
 - Workspace baseline recommendation: available in `outputs/first_commit_recommendation.md`.
-- Git candidate files: 61.
+- Git candidate files: 62.
 - Git candidate size: about 0.15 MB.
-- Recommended baseline files: 61.
+- Recommended baseline files: 62.
 - Manual confirmation items for baseline review: 0.
 - Confirmed public/site assets included: 0.
 - Line ending drift reminders: 0.
@@ -28,7 +28,7 @@ python tools/generate_workspace_status.py
 ```powershell
 python tools/check_workspace.py
 python tools/audit_git_readiness.py
-python tools/audit_line_endings.py
+python tools/audit_line_endings.py --strict
 python tools/test_workspace_tools.py
 python tools/summarize_git_candidates.py
 python tools/prepare_baseline_report.py
@@ -59,6 +59,7 @@ python tools/audit_git_readiness.py --max-mb 1
 - `tools/verify_baseline_report.py`: verifies that the baseline recommendation matches current Git candidates.
 - `tools/verify_first_commit_report.py`: legacy-compatible implementation behind the baseline report verifier.
 - `tools/verify_workspace_status.py`: verifies that `WORKSPACE_STATUS.md` matches the current generated status.
+- `tools/workspace_manifest.py`: centralizes shared workspace tool metadata and maintenance command lists.
 
 ## Current Skills
 
@@ -107,7 +108,7 @@ python tools/audit_git_readiness.py --max-mb 1
 
 ## Git Baseline Notes
 
-The current baseline recommendation treats all 61 recommended files as baseline candidates.
+The current baseline recommendation treats all 62 recommended files as baseline candidates.
 
 Repository normalization is governed by `.gitattributes`:
 

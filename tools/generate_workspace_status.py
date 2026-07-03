@@ -6,22 +6,7 @@ import subprocess
 from datetime import date
 from pathlib import Path
 
-
-TOOL_DESCRIPTIONS = {
-    "tools/audit_git_readiness.py": "checks Git candidates for large files, sensitive names, and secret-like content.",
-    "tools/audit_line_endings.py": "reports line ending drift against `.gitattributes` policy.",
-    "tools/check_workspace.py": "checks required workspace structure, deliberately trackable optional task index quality, registry coverage, Git ignore behavior, and UTF-8 text readability.",
-    "tools/generate_workspace_status.py": "regenerates this current-state summary.",
-    "tools/make_task.py": "creates isolated task folders with safe defaults and `--dry-run`.",
-    "tools/prepare_baseline_report.py": "writes the workspace baseline recommendation report.",
-    "tools/prepare_first_commit_report.py": "legacy-compatible implementation behind the baseline report command.",
-    "tools/run_workspace_maintenance.py": "runs the full maintenance chain.",
-    "tools/summarize_git_candidates.py": "summarizes Git candidates by area, extension, and largest files.",
-    "tools/test_workspace_tools.py": "runs lightweight regression tests for workspace tools.",
-    "tools/verify_baseline_report.py": "verifies that the baseline recommendation matches current Git candidates.",
-    "tools/verify_first_commit_report.py": "legacy-compatible implementation behind the baseline report verifier.",
-    "tools/verify_workspace_status.py": "verifies that `WORKSPACE_STATUS.md` matches the current generated status.",
-}
+from workspace_manifest import CORE_MAINTENANCE_COMMANDS, TOOL_DESCRIPTIONS
 
 
 def run_command(root: Path, args: list[str]) -> subprocess.CompletedProcess[str]:
@@ -156,16 +141,7 @@ def build_status(root: Path) -> str:
         "## Core Commands",
         "",
         "```powershell",
-        "python tools/check_workspace.py",
-        "python tools/audit_git_readiness.py",
-        "python tools/audit_line_endings.py",
-        "python tools/test_workspace_tools.py",
-        "python tools/summarize_git_candidates.py",
-        "python tools/prepare_baseline_report.py",
-        "python tools/verify_baseline_report.py",
-        "python tools/generate_workspace_status.py",
-        "python tools/verify_workspace_status.py",
-        "python tools/run_workspace_maintenance.py",
+        *CORE_MAINTENANCE_COMMANDS,
         "```",
         "",
         "Use stricter large-file review when preparing a careful baseline or broad structural commit:",
