@@ -246,6 +246,15 @@ class WorkspaceStatusTests(unittest.TestCase):
         self.assertIn("# Workspace Status", status)
         self.assertIn("## Current Health", status)
 
+    def test_status_generator_lists_all_tool_scripts(self) -> None:
+        generator = self.verify_status.load_status_generator(ROOT)
+        status = generator.build_status(ROOT)
+
+        for path in sorted((ROOT / "tools").glob("*.py")):
+            relative_path = str(path.relative_to(ROOT)).replace("\\", "/")
+            with self.subTest(relative_path=relative_path):
+                self.assertIn(f"- `{relative_path}`:", status)
+
 
 class FirstCommitVerificationTests(unittest.TestCase):
     @classmethod
