@@ -41,19 +41,6 @@ REQUIRED_ITEMS = [
     "prompts/safe_debug.md",
     "prompts/safe_setup.md",
     "tools",
-    "tools/audit_git_readiness.py",
-    "tools/audit_line_endings.py",
-    "tools/check_workspace.py",
-    "tools/generate_workspace_status.py",
-    "tools/make_task.py",
-    "tools/prepare_baseline_report.py",
-    "tools/prepare_first_commit_report.py",
-    "tools/run_workspace_maintenance.py",
-    "tools/summarize_git_candidates.py",
-    "tools/test_workspace_tools.py",
-    "tools/verify_baseline_report.py",
-    "tools/verify_first_commit_report.py",
-    "tools/verify_workspace_status.py",
     "envs",
     "envs/aider.md",
     "envs/base_python.md",
@@ -185,6 +172,15 @@ def get_tool_script_paths(root: Path) -> list[str]:
     return [f"tools/{path.name}" for path in sorted((root / "tools").glob("*.py"))]
 
 
+def required_items(root: Path) -> list[str]:
+    items: list[str] = []
+    for item in REQUIRED_ITEMS:
+        items.append(item)
+        if item == "tools":
+            items.extend(get_tool_script_paths(root))
+    return items
+
+
 def get_sop_paths(root: Path) -> list[str]:
     return [f"sops/{path.name}" for path in sorted((root / "sops").glob("*.md"))]
 
@@ -225,10 +221,11 @@ def check_registry_paths(
     require_status: bool,
     status_text: str,
 ) -> None:
-    required_items = set(REQUIRED_ITEMS)
+    root = Path(__file__).resolve().parents[1]
+    required_item_set = set(required_items(root))
 
     for relative_path in paths:
-        if require_items and relative_path not in required_items:
+        if require_items and relative_path not in required_item_set:
             warnings.append(f"{relative_path} is not listed in REQUIRED_ITEMS")
         if require_status and relative_path not in status_text:
             warnings.append(f"{relative_path} is not documented in WORKSPACE_STATUS.md")
@@ -393,7 +390,7 @@ def main() -> int:
     existing: list[str] = []
     warnings: list[str] = []
 
-    for item in REQUIRED_ITEMS:
+    for item in required_items(root):
         path = root / item
         if path.exists():
             existing.append(item)

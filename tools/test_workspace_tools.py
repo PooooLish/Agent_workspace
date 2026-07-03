@@ -133,7 +133,7 @@ class CheckWorkspaceTests(unittest.TestCase):
         self.assertFalse(self.check_workspace.is_git_ignored(ROOT, "tasks/README.md"))
 
     def test_tool_scripts_are_registered_and_documented(self) -> None:
-        required_items = set(self.check_workspace.REQUIRED_ITEMS)
+        required_items = set(self.check_workspace.required_items(ROOT))
         status_text = (ROOT / "WORKSPACE_STATUS.md").read_text(encoding="utf-8")
 
         for relative_path in self.check_workspace.get_tool_script_paths(ROOT):
@@ -155,7 +155,7 @@ class CheckWorkspaceTests(unittest.TestCase):
         self.assertIn("tools/not_registered.py is not documented in WORKSPACE_STATUS.md", warnings)
 
     def test_skills_are_registered_and_documented(self) -> None:
-        required_items = set(self.check_workspace.REQUIRED_ITEMS)
+        required_items = set(self.check_workspace.required_items(ROOT))
         status_text = (ROOT / "WORKSPACE_STATUS.md").read_text(encoding="utf-8")
 
         for relative_path in self.check_workspace.get_skill_main_paths(ROOT):
@@ -168,7 +168,7 @@ class CheckWorkspaceTests(unittest.TestCase):
                 self.assertIn(relative_path, status_text)
 
     def test_sops_are_registered_and_documented(self) -> None:
-        required_items = set(self.check_workspace.REQUIRED_ITEMS)
+        required_items = set(self.check_workspace.required_items(ROOT))
         status_text = (ROOT / "WORKSPACE_STATUS.md").read_text(encoding="utf-8")
 
         for relative_path in self.check_workspace.get_sop_paths(ROOT):
@@ -177,7 +177,7 @@ class CheckWorkspaceTests(unittest.TestCase):
                 self.assertIn(relative_path, status_text)
 
     def test_prompts_are_registered_and_documented(self) -> None:
-        required_items = set(self.check_workspace.REQUIRED_ITEMS)
+        required_items = set(self.check_workspace.required_items(ROOT))
         status_text = (ROOT / "WORKSPACE_STATUS.md").read_text(encoding="utf-8")
 
         for relative_path in self.check_workspace.get_prompt_paths(ROOT):
@@ -186,7 +186,7 @@ class CheckWorkspaceTests(unittest.TestCase):
                 self.assertIn(relative_path, status_text)
 
     def test_envs_are_registered_and_documented(self) -> None:
-        required_items = set(self.check_workspace.REQUIRED_ITEMS)
+        required_items = set(self.check_workspace.required_items(ROOT))
         status_text = (ROOT / "WORKSPACE_STATUS.md").read_text(encoding="utf-8")
 
         for relative_path in self.check_workspace.get_env_paths(ROOT):
