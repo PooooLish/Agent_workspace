@@ -30,6 +30,10 @@ This creates `tasks/my_task_name/` with task-level docs, source folders, test fo
 
 Concrete task folders stay local by default. Keep task status, registries, and cleanup notes inside the task folder unless you deliberately decide to publish them.
 
+## How to publish a task independently
+
+Concrete task folders remain private to the root workspace repository. When a task has a real deliverable and should be published, follow `sops/publish_independent_task.md` to initialize that task directory as a separate Git repository. Never publish a concrete experiment directory under `sandboxes/`; only its policy README belongs to the root repository.
+
 ## How to check before committing
 
 Run:

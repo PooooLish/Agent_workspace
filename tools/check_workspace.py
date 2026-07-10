@@ -38,6 +38,8 @@ REQUIRED_GITIGNORE_PATTERNS = [
     "**/tmp/",
     "**/logs/",
     "**/node_modules/",
+    "tasks/*",
+    "sandboxes/*",
     "*.mp4",
 ]
 
@@ -56,6 +58,7 @@ REQUIRED_IGNORED_PATHS = [
     "tasks/private_example/logs/run.log",
     "tasks/private_example/node_modules/package/index.js",
     "tasks/private_example/AGENTS.md",
+    "sandboxes/private_example/test.txt",
 ]
 
 REQUIRED_TASK_ITEMS = [

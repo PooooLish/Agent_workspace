@@ -100,6 +100,8 @@ def build_status(root: Path) -> str:
 
     task_folder_ignored = is_ignored(root, "tasks/private_example/AGENTS.md")
     task_placeholder_ignored = is_ignored(root, "tasks/README.md")
+    sandbox_folder_ignored = is_ignored(root, "sandboxes/private_example/test.txt")
+    sandbox_placeholder_ignored = is_ignored(root, "sandboxes/README.md")
     report_ignored = is_ignored(root, "outputs/first_commit_recommendation.md")
 
     check_status = "passing" if check.returncode == 0 else f"failing with exit code {check.returncode}"
@@ -189,13 +191,16 @@ def build_status(root: Path) -> str:
         "- local backup files such as `*.bak`",
         "- local Playwright CLI artifacts",
         "- concrete task folders under `tasks/*`",
+        "- concrete sandbox experiments under `sandboxes/*`",
         "",
-        "## Task Privacy",
+        "## Task And Sandbox Privacy",
         "",
         "- Concrete task folders are local-private by default.",
         f"- Example concrete task path ignored by Git: {'yes' if task_folder_ignored else 'no'}.",
         f"- `tasks/README.md` remains trackable: {'yes' if not task_placeholder_ignored else 'no'}.",
-        "- Publish task files only after deliberate review and a narrow ignore-rule exception.",
+        "- Publish an approved task only as a separate Git repository after deliberate review.",
+        f"- Example sandbox experiment path ignored by Git: {'yes' if sandbox_folder_ignored else 'no'}.",
+        f"- `sandboxes/README.md` remains trackable: {'yes' if not sandbox_placeholder_ignored else 'no'}.",
         "",
         "## Ignored Generated Reports",
         "",

@@ -121,6 +121,10 @@ class CheckWorkspaceTests(unittest.TestCase):
         self.assertTrue(self.check_workspace.is_git_ignored(ROOT, "tasks/private_example/AGENTS.md"))
         self.assertFalse(self.check_workspace.is_git_ignored(ROOT, "tasks/README.md"))
 
+    def test_sandboxes_are_private_by_default(self) -> None:
+        self.assertTrue(self.check_workspace.is_git_ignored(ROOT, "sandboxes/private_example/test.txt"))
+        self.assertFalse(self.check_workspace.is_git_ignored(ROOT, "sandboxes/README.md"))
+
     def test_tool_scripts_are_registered_and_documented(self) -> None:
         required_items = set(self.check_workspace.required_items(ROOT))
         status_text = (ROOT / "WORKSPACE_STATUS.md").read_text(encoding="utf-8")
@@ -254,6 +258,13 @@ class WorkspaceStatusTests(unittest.TestCase):
         }
 
         self.assertEqual(actual_tools, described_tools)
+
+    def test_status_generator_uses_independent_task_publication(self) -> None:
+        generator = self.verify_status.load_status_generator(ROOT)
+        status = generator.build_status(ROOT)
+
+        self.assertIn("separate Git repository", status)
+        self.assertNotIn("narrow ignore-rule exception", status)
 
 
 class FirstCommitVerificationTests(unittest.TestCase):

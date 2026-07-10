@@ -26,6 +26,10 @@ secrets/*
 tasks/*
 !tasks/README.md
 
+# Sandbox experiments are local; the policy README remains trackable.
+sandboxes/*
+!sandboxes/README.md
+
 *.zip
 *.tar
 *.tar.gz

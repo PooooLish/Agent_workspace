@@ -1,6 +1,6 @@
 # Workspace Status
 
-Last generated: 2026-07-03
+Last generated: 2026-07-11
 
 This file records the current operating state of `D:\MaHong\agent_workspace`.
 
@@ -15,12 +15,12 @@ python tools/generate_workspace_status.py
 - Structure check: passing.
 - Git readiness audit: passing.
 - Workspace baseline recommendation: available in `outputs/first_commit_recommendation.md`.
-- Git candidate files: 62.
-- Git candidate size: about 0.15 MB.
+- Git candidate files: 79.
+- Git candidate size: about 0.26 MB.
 - Recommended baseline files: 62.
 - Manual confirmation items for baseline review: 0.
 - Confirmed public/site assets included: 0.
-- Line ending drift reminders: 0.
+- Line ending drift reminders: 5.
 - Strict 1 MB large-file reminders: 0.
 
 ## Core Commands
@@ -73,6 +73,7 @@ python tools/audit_git_readiness.py --max-mb 1
 - `skills/valorant-highlight-editing/references/research_sources.md`
 - `skills/valorant-highlight-editing/references/software_toolchain.md`
 - `skills/valorant-highlight-editing/SKILL.md`
+- `skills/visual_design_review/SKILL.md`
 
 ## Current SOPs
 
@@ -81,6 +82,7 @@ python tools/audit_git_readiness.py --max-mb 1
 - `sops/line_endings.md`
 - `sops/modify_existing_project.md`
 - `sops/new_task.md`
+- `sops/publish_independent_task.md`
 - `sops/safe_shell_commands.md`
 - `sops/setup_external_api.md`
 - `sops/task_closeout.md`
@@ -125,13 +127,16 @@ Important exclusions are governed by `.gitignore`:
 - local backup files such as `*.bak`
 - local Playwright CLI artifacts
 - concrete task folders under `tasks/*`
+- concrete sandbox experiments under `sandboxes/*`
 
-## Task Privacy
+## Task And Sandbox Privacy
 
 - Concrete task folders are local-private by default.
 - Example concrete task path ignored by Git: yes.
 - `tasks/README.md` remains trackable: yes.
-- Publish task files only after deliberate review and a narrow ignore-rule exception.
+- Publish an approved task only as a separate Git repository after deliberate review.
+- Example sandbox experiment path ignored by Git: yes.
+- `sandboxes/README.md` remains trackable: yes.
 
 ## Ignored Generated Reports
 
