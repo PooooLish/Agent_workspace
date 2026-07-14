@@ -1,6 +1,13 @@
 # Agent Workspace 中文说明
 
+[English](README.md) | **简体中文**
+
 这是一个个人长期使用的 agent 工作区，用来学习和使用 Codex、Claude Code、OpenCode、Aider 等 coding agent。它把通用规则、提示词、SOP、环境说明和任务目录集中在一起，方便复用，也方便把不同任务彼此隔离。
+
+## 文档
+
+- [中文工作区指南](WORKSPACE_GUIDE.zh-CN.md)
+- [English README](README.md)
 
 ## 目录说明
 

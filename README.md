@@ -1,6 +1,13 @@
 ﻿# Agent Workspace
 
+**English** | [简体中文](README.zh-CN.md)
+
 This workspace is a personal, reusable home for learning and using Codex, Claude Code, OpenCode, Aider, and similar coding agents. It keeps shared rules, prompts, SOPs, and task folders in one place so each task stays isolated and repeatable.
+
+## Documentation
+
+- [English workspace guide](WORKSPACE_GUIDE.md)
+- [简体中文说明](README.zh-CN.md)
 
 ## Directory overview
 
