@@ -47,11 +47,6 @@ python tools/workspace.py check --full
 - `skills/documentation_writer/SKILL.md`
 - `skills/linux_debugging/SKILL.md`
 - `skills/python_project_setup/SKILL.md`
-- `skills/valorant-highlight-editing/agents/openai.yaml`
-- `skills/valorant-highlight-editing/references/platform_style_patterns.md`
-- `skills/valorant-highlight-editing/references/research_sources.md`
-- `skills/valorant-highlight-editing/references/software_toolchain.md`
-- `skills/valorant-highlight-editing/SKILL.md`
 - `skills/visual_design_review/SKILL.md`
 
 ## Current SOPs

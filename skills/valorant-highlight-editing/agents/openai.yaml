@@ -1,4 +1,0 @@
-interface:
-  display_name: "Valorant Highlight Editing"
-  short_description: "Plan and edit high-impact Valorant montages."
-  default_prompt: "Use $valorant-highlight-editing to plan, review, or render a Valorant kill-highlight montage."
