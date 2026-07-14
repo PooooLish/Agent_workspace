@@ -51,3 +51,4 @@ sandboxes/*
 .vscode/
 .idea/
 .playwright-cli/
+.worktrees/
