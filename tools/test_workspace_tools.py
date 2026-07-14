@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import io
 import importlib.util
 import subprocess
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 
 from workspace_manifest import CORE_MAINTENANCE_COMMANDS
@@ -325,6 +327,25 @@ class WorkspaceStatusTests(unittest.TestCase):
         self.assertIn("separate Git repository", status)
         self.assertNotIn("narrow ignore-rule exception", status)
 
+    def test_status_omits_volatile_local_metrics(self) -> None:
+        generator = self.verify_status.load_status_generator(ROOT)
+        status = generator.build_status(ROOT)
+        for phrase in (
+            "Last generated:",
+            "Git candidate files:",
+            "Git candidate size:",
+            "Line ending drift reminders:",
+            "large-file reminders:",
+        ):
+            self.assertNotIn(phrase, status)
+
+    def test_status_documents_archive_privacy(self) -> None:
+        generator = self.verify_status.load_status_generator(ROOT)
+        status = generator.build_status(ROOT)
+
+        self.assertIn("archives/README.md", status)
+        self.assertIn("archived task path ignored by Git: yes", status)
+
 
 class WorkspaceCommandTests(unittest.TestCase):
     @classmethod
@@ -351,7 +372,8 @@ class WorkspaceCommandTests(unittest.TestCase):
             calls.append(command)
             return subprocess.CompletedProcess(command, 7)
 
-        code = self.workspace.run_steps(ROOT, self.workspace.QUICK_CHECK_STEPS[:1], runner=runner)
+        with redirect_stdout(io.StringIO()):
+            code = self.workspace.run_steps(ROOT, self.workspace.QUICK_CHECK_STEPS[:1], runner=runner)
 
         self.assertEqual(code, 7)
         self.assertEqual(len(calls), 1)

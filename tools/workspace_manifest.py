@@ -33,16 +33,9 @@ FULL_ONLY_STEPS = (
 
 
 CORE_MAINTENANCE_COMMANDS = [
-    "python tools/check_workspace.py",
-    "python tools/audit_git_readiness.py",
-    "python tools/audit_line_endings.py --strict",
-    "python tools/test_workspace_tools.py",
-    "python tools/summarize_git_candidates.py",
-    "python tools/prepare_baseline_report.py",
-    "python tools/verify_baseline_report.py",
-    "python tools/generate_workspace_status.py",
-    "python tools/verify_workspace_status.py",
-    "python tools/run_workspace_maintenance.py",
+    "python tools/workspace.py new my_task",
+    "python tools/workspace.py check",
+    "python tools/workspace.py check --full",
 ]
 
 TOOL_DESCRIPTIONS = {

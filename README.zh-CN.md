@@ -30,7 +30,7 @@
 应在工作区根目录执行：
 
 ```bash
-python tools/make_task.py my_task_name
+python tools/workspace.py new my_task
 ```
 
 建议把“创建任务”这一步放在 `D:\MaHong\agent_workspace` 这个根目录上下文里完成，而不是放在 `tasks/` 目录里。
@@ -42,6 +42,7 @@ tasks/my_task_name/
 ├── AGENTS.md
 ├── task.md
 ├── README.md
+├── summary.md
 ├── src/
 ├── scripts/
 ├── data/
@@ -123,27 +124,19 @@ opencode .
 
 ## 提交前如何检查
 
-推荐运行：
+日常修改框架时，运行只读快速检查：
 
 ```powershell
-python tools/check_workspace.py
-python tools/audit_git_readiness.py
-python tools/audit_line_endings.py --strict
-python tools/test_workspace_tools.py
-python tools/summarize_git_candidates.py
-python tools/prepare_baseline_report.py
-python tools/verify_baseline_report.py
-python tools/generate_workspace_status.py
-python tools/verify_workspace_status.py
+python tools/workspace.py check
 ```
 
-也可以直接运行完整维护链：
+大范围框架提交前，运行会刷新维护报告的完整检查：
 
 ```powershell
-python tools/run_workspace_maintenance.py
+python tools/workspace.py check --full
 ```
 
-baseline 推荐报告写入 `outputs/first_commit_recommendation.md`，该文件默认被 Git 忽略。大范围结构提交前，优先看这个报告和 `WORKSPACE_STATUS.md`，并确认 `git ls-files tasks` 只包含有意公开的任务占位文件。
+baseline 推荐报告写入 `outputs/first_commit_recommendation.md`，该文件默认被 Git 忽略。详细步骤与兼容命令见 `sops/workspace_maintenance.md`。
 
 ## secrets 的处理方式
 

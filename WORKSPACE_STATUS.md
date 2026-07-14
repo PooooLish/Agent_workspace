@@ -1,8 +1,6 @@
 # Workspace Status
 
-Last generated: 2026-07-14
-
-This file records the current operating state of `D:\MaHong\agent_workspace`.
+This generated file records stable framework inventory and privacy-policy outcomes.
 
 Regenerate it with:
 
@@ -12,36 +10,16 @@ python tools/generate_workspace_status.py
 
 ## Current Health
 
-- Structure check: failing with exit code 2.
-- Git readiness audit: passing.
-- Workspace baseline recommendation: missing in `outputs/first_commit_recommendation.md`.
-- Git candidate files: 70.
-- Git candidate size: about 0.21 MB.
-- Recommended baseline files: 0.
-- Manual confirmation items for baseline review: 0.
-- Confirmed public/site assets included: 0.
-- Line ending drift reminders: 0.
-- Strict 1 MB large-file reminders: 0.
+- Stable framework inventories are generated from the current workspace files.
+- Privacy-policy outcomes are checked with `git check-ignore`.
+- Run the commands below for live tests, Git readiness, and line-ending results.
 
 ## Core Commands
 
 ```powershell
-python tools/check_workspace.py
-python tools/audit_git_readiness.py
-python tools/audit_line_endings.py --strict
-python tools/test_workspace_tools.py
-python tools/summarize_git_candidates.py
-python tools/prepare_baseline_report.py
-python tools/verify_baseline_report.py
-python tools/generate_workspace_status.py
-python tools/verify_workspace_status.py
-python tools/run_workspace_maintenance.py
-```
-
-Use stricter large-file review when preparing a careful baseline or broad structural commit:
-
-```powershell
-python tools/audit_git_readiness.py --max-mb 1
+python tools/workspace.py new my_task
+python tools/workspace.py check
+python tools/workspace.py check --full
 ```
 
 ## Current Tools
@@ -109,9 +87,7 @@ python tools/audit_git_readiness.py --max-mb 1
 - `envs/node_tools.md`
 - `envs/opencode.md`
 
-## Git Baseline Notes
-
-The current baseline recommendation treats all 0 recommended files as baseline candidates.
+## Repository Policy
 
 Repository normalization is governed by `.gitattributes`:
 
@@ -129,8 +105,10 @@ Important exclusions are governed by `.gitignore`:
 - local Playwright CLI artifacts
 - concrete task folders under `tasks/*`
 - concrete sandbox experiments under `sandboxes/*`
+- concrete archived tasks under `archives/*`
+- local Superpowers execution state under `.superpowers/`
 
-## Task And Sandbox Privacy
+## Private Workspace Areas
 
 - Concrete task folders are local-private by default.
 - Example concrete task path ignored by Git: yes.
@@ -138,14 +116,16 @@ Important exclusions are governed by `.gitignore`:
 - Publish an approved task only as a separate Git repository after deliberate review.
 - Example sandbox experiment path ignored by Git: yes.
 - `sandboxes/README.md` remains trackable: yes.
+- Example archived task path ignored by Git: yes.
+- `archives/README.md` remains trackable: yes.
+- Example Superpowers runtime path ignored by Git: yes.
 
 ## Ignored Generated Reports
 
 - `outputs/first_commit_recommendation.md` ignored by Git: yes.
 
-## Next Reasonable Actions
+## Routine Actions
 
-1. Review `outputs/first_commit_recommendation.md` before broad commits.
-2. Confirm `git ls-files tasks` contains only intended public task placeholders.
-3. Stage and commit only after the checks above pass.
-4. Regenerate this file after broad workspace maintenance.
+1. Run `python tools/workspace.py check` during routine framework work.
+2. Run `python tools/workspace.py check --full` before broad framework commits.
+3. Publish approved tasks only as separate Git repositories.

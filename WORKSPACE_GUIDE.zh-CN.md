@@ -21,6 +21,14 @@
 - 流程可复用
 - 文档可读、可维护
 
+日常统一入口：
+
+```powershell
+python tools/workspace.py new my_task
+python tools/workspace.py check
+python tools/workspace.py check --full
+```
+
 ## 2. 当前根目录结构
 
 当前工作区根目录包含：
@@ -520,19 +528,13 @@ opencode .
 
 ### Codex 全局技能
 
-在 workspace 仓库外，你当前的 Codex 用户环境还额外安装了这些技能，位于 `C:\Users\MaHong\.codex\skills`：
-
-- `cli-creator`
-- `jupyter-notebook`
-- `playwright`
-- `screenshot`
-- `security-best-practices`
+Codex 全局 skill 和插件位于本仓库之外，可能独立变化。需要时应从当前 Codex 会话查询；本 workspace 自己维护的 skill 清单以自动生成的 `WORKSPACE_STATUS.md` 为准。
 
 ## 11. 推荐日常工作流
 
 推荐的日常路径是：
 
-1. 在 workspace 根目录运行 `python tools/make_task.py <task_name>`
+1. 在 workspace 根目录运行 `python tools/workspace.py new <task_name>`
 2. 填写 `tasks/<task_name>/task.md`
 3. 进入该任务目录
 4. 选择一个 agent 开始工作
