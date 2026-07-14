@@ -59,6 +59,36 @@ class MakeTaskTests(unittest.TestCase):
         self.assertIn("Dry run:", result.stdout)
         self.assertFalse(task_path.exists(), "dry-run unexpectedly created a task folder")
 
+    def test_task_template_contains_handoff_sections(self) -> None:
+        text = self.make_task.build_task_md("example")
+        for heading in (
+            "## Status",
+            "## Goal",
+            "## Non-goals",
+            "## Acceptance criteria",
+            "## Verification commands",
+            "## Decisions",
+            "## Progress",
+            "## Next action",
+            "## Blockers",
+        ):
+            self.assertIn(heading, text)
+        self.assertIn("planning", text)
+
+    def test_scaffold_creates_summary_template(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tasks").mkdir()
+
+            created, skipped = self.make_task.scaffold_task(root, "example")
+
+            self.assertFalse(skipped)
+            summary_path = root / "tasks" / "example" / "summary.md"
+            self.assertIn(str(summary_path), created)
+            summary = summary_path.read_text(encoding="utf-8")
+            for heading in ("## Goal", "## Outcome", "## Changes", "## Verification", "## Open issues"):
+                self.assertIn(heading, summary)
+
 
 class GitReadinessTests(unittest.TestCase):
     @classmethod

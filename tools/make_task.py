@@ -72,9 +72,17 @@ def build_task_agents(task_name: str) -> str:
 def build_task_md(task_name: str) -> str:
     return f"""# Task: {task_name}
 
+## Status
+
+planning
+
 ## Goal
 
 Describe the task objective here.
+
+## Non-goals
+
+List work that is intentionally outside this task.
 
 ## Constraints
 
@@ -85,9 +93,44 @@ Describe the task objective here.
 
 List the files, data, or references needed for this task.
 
-## Expected output
+## Acceptance criteria
 
-Describe the intended deliverable and verification method.
+List the observable conditions that must be true for this task to be complete.
+
+## Verification commands
+
+List the commands that prove the acceptance criteria.
+
+## Decisions
+
+Record durable implementation decisions and their reasons.
+
+## Progress
+
+Record completed milestones that matter for handoff.
+
+## Next action
+
+Describe the single next useful action.
+
+## Blockers
+
+Record blockers, or write `None`.
+"""
+
+
+def build_summary_md(task_name: str) -> str:
+    return f"""# Summary: {task_name}
+
+## Goal
+
+## Outcome
+
+## Changes
+
+## Verification
+
+## Open issues
 """
 
 
@@ -124,6 +167,31 @@ coverage/
 """
 
 
+def scaffold_task(workspace_root: Path, task_name: str) -> tuple[list[str], list[str]]:
+    tasks_root = workspace_root / "tasks"
+    task_root = tasks_root / task_name
+    resolved_task_root = task_root.resolve()
+    resolved_tasks_root = tasks_root.resolve()
+    if resolved_tasks_root not in resolved_task_root.parents:
+        raise ValueError("resolved task path must stay inside the tasks directory")
+
+    created: list[str] = []
+    skipped: list[str] = []
+    task_root.mkdir(parents=True, exist_ok=True)
+    for dirname in TASK_DIRS:
+        dir_path = task_root / dirname
+        if not dir_path.exists():
+            dir_path.mkdir(parents=True, exist_ok=True)
+            created.append(str(dir_path))
+
+    write_if_missing(task_root / "AGENTS.md", build_task_agents(task_name), created, skipped)
+    write_if_missing(task_root / "task.md", build_task_md(task_name), created, skipped)
+    write_if_missing(task_root / "README.md", build_readme(task_name), created, skipped)
+    write_if_missing(task_root / "summary.md", build_summary_md(task_name), created, skipped)
+    write_if_missing(task_root / ".gitignore", TASK_GITIGNORE, created, skipped)
+    return created, skipped
+
+
 def main() -> int:
     if len(sys.argv) not in (2, 3):
         print("Usage: python tools/make_task.py task_name [--dry-run]")
@@ -145,36 +213,21 @@ def main() -> int:
     workspace_root = Path(__file__).resolve().parents[1]
     tasks_root = workspace_root / "tasks"
     task_root = tasks_root / task_name
-    resolved_task_root = task_root.resolve()
-    resolved_tasks_root = tasks_root.resolve()
-    if resolved_tasks_root not in resolved_task_root.parents:
-        print("Error: resolved task path must stay inside the tasks directory.")
-        return 1
-
-    created: list[str] = []
-    skipped: list[str] = []
-
     if dry_run:
         print(f"Dry run: task directory would be created at {task_root}")
         print("Planned directories:")
         for dirname in TASK_DIRS:
             print(f"  + {task_root / dirname}")
         print("Planned files:")
-        for filename in ("AGENTS.md", "task.md", "README.md", ".gitignore"):
+        for filename in ("AGENTS.md", "task.md", "README.md", "summary.md", ".gitignore"):
             print(f"  + {task_root / filename}")
         return 0
 
-    task_root.mkdir(parents=True, exist_ok=True)
-    for dirname in TASK_DIRS:
-        dir_path = task_root / dirname
-        if not dir_path.exists():
-            dir_path.mkdir(parents=True, exist_ok=True)
-            created.append(str(dir_path))
-
-    write_if_missing(task_root / "AGENTS.md", build_task_agents(task_name), created, skipped)
-    write_if_missing(task_root / "task.md", build_task_md(task_name), created, skipped)
-    write_if_missing(task_root / "README.md", build_readme(task_name), created, skipped)
-    write_if_missing(task_root / ".gitignore", TASK_GITIGNORE, created, skipped)
+    try:
+        created, skipped = scaffold_task(workspace_root, task_name)
+    except ValueError as error:
+        print(f"Error: {error}.")
+        return 1
 
     print("Created items:")
     for item in created:
