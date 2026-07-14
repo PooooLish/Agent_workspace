@@ -176,9 +176,7 @@ class CheckWorkspaceTests(unittest.TestCase):
     def test_publication_docs_require_independent_repository(self) -> None:
         docs = [
             "README.md",
-            "README.zh-CN.md",
             "WORKSPACE_GUIDE.md",
-            "WORKSPACE_GUIDE.zh-CN.md",
             "tasks/README.md",
             "sops/git_first_commit.md",
             "sops/publish_independent_task.md",
@@ -278,9 +276,7 @@ class CheckWorkspaceTests(unittest.TestCase):
     def test_core_maintenance_commands_are_in_docs(self) -> None:
         doc_texts = {
             "README.md": (ROOT / "README.md").read_text(encoding="utf-8"),
-            "README.zh-CN.md": (ROOT / "README.zh-CN.md").read_text(encoding="utf-8"),
             "WORKSPACE_GUIDE.md": (ROOT / "WORKSPACE_GUIDE.md").read_text(encoding="utf-8"),
-            "WORKSPACE_GUIDE.zh-CN.md": (ROOT / "WORKSPACE_GUIDE.zh-CN.md").read_text(encoding="utf-8"),
         }
 
         for filename, text in doc_texts.items():

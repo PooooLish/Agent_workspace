@@ -9,9 +9,7 @@ import subprocess
 REQUIRED_ITEMS = [
     "AGENTS.md",
     "README.md",
-    "README.zh-CN.md",
     "WORKSPACE_GUIDE.md",
-    "WORKSPACE_GUIDE.zh-CN.md",
     ".gitattributes",
     ".gitignore",
     "WORKSPACE_STATUS.md",

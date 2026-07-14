@@ -1,5 +1,8 @@
 # Workspace Guide
 
+<details open>
+<summary><strong>English</strong></summary>
+
 This document is the maintainable master guide for `D:\MaHong\agent_workspace`. It is intended to help a future you, or any coding agent working with you, understand the purpose, structure, components, workflows, and maintenance model of the entire workspace from a single file.
 
 ## 1. Purpose
@@ -35,9 +38,7 @@ The workspace currently contains:
 
 - `AGENTS.md`
 - `README.md`
-- `README.zh-CN.md`
 - `WORKSPACE_GUIDE.md`
-- `WORKSPACE_GUIDE.zh-CN.md`
 - `WORKSPACE_STATUS.md`
 - `.gitattributes`
 - `.gitignore`
@@ -72,17 +73,13 @@ It is the most important behavioral file in the workspace. Any agent working in 
 
 ### `README.md`
 
-This is the short English overview. It explains the workspace purpose, directory layout, new-task flow, how to use agents, how to handle secrets, and how to archive tasks.
-
-### `README.zh-CN.md`
-
-This is the short Chinese overview. It mirrors the main workspace concepts in Chinese and serves as the most accessible entry point for daily use.
+This is the bilingual short overview. Its English section is open by default, and its Simplified Chinese section can be expanded on the same GitHub page.
 
 The Chinese Markdown files are UTF-8. On Windows PowerShell, use explicit UTF-8 when reading them from the terminal:
 
 ```powershell
-Get-Content -Raw -Encoding UTF8 README.zh-CN.md
-Get-Content -Raw -Encoding UTF8 WORKSPACE_GUIDE.zh-CN.md
+Get-Content -Raw -Encoding UTF8 README.md
+Get-Content -Raw -Encoding UTF8 WORKSPACE_GUIDE.md
 ```
 
 ### `.gitignore`
@@ -713,3 +710,244 @@ Its main value is not any single file. Its value comes from how all the parts wo
 - environment notes connect local tools to safe workflows
 
 Treat this file as the single source of truth for understanding the workspace at a glance, and update it whenever the structure or working model changes materially.
+
+</details>
+
+<details>
+<summary><strong>简体中文</strong></summary>
+
+这份文档是 `D:\MaHong\agent_workspace` 的可维护总说明，目标是让你或未来协作的 agent 通过这一份文档理解整个 workspace 的定位、目录结构、核心组件、使用流程和维护方式。
+
+## 1. 工作区定位
+
+这个 workspace 是个人长期使用的 agent 工作中枢，用来统一管理 Codex、Claude Code、OpenCode、Aider 等 coding agent 的共用规则、提示词、SOP、环境说明和任务模板。
+
+它主要解决四类问题：
+
+1. 把共享规则和工作习惯放在一个地方。
+2. 把正式任务和临时实验隔离开。
+3. 复用 prompts、SOP 和 skills，而不是每次从头编写。
+4. 让工作过程更容易审查、接续、归档和回看。
+
+设计原则：
+
+- 安全优先
+- 任务隔离
+- 最小修改
+- 流程可复用
+- 文档可读、可维护
+
+日常统一入口：
+
+```powershell
+python tools/workspace.py new my_task
+python tools/workspace.py check
+python tools/workspace.py check --full
+```
+
+## 2. 当前根目录结构
+
+当前工作区根目录包含：
+
+- `AGENTS.md`
+- `README.md`
+- `WORKSPACE_GUIDE.md`
+- `WORKSPACE_STATUS.md`
+- `.gitattributes`
+- `.gitignore`
+- `skills/`
+- `sops/`
+- `prompts/`
+- `tools/`
+- `envs/`
+- `tasks/`
+- `sandboxes/`
+- `archives/`
+- `secrets/`
+
+这些顶层项目各自承担不同职责，维护时应尽量保持边界清晰。
+
+## 3. 根层治理文件
+
+### `AGENTS.md`
+
+这是整个工作区的根规则文件，也是最重要的行为边界说明。它定义 agent 的全局角色、安全规则、默认工作循环、规则层级、任务隔离和文件修改规则。
+
+规则层级：
+
+- workspace 根 `AGENTS.md` 是全局规则。
+- 每个任务自己的 `AGENTS.md` 是局部规则。
+- 局部规则只能补充或收紧全局规则。
+- 如果两者冲突，以更严格者为准。
+
+### `README.md`
+
+这是中英文合并的简要总览。英文默认展开，简体中文可以在同一个 GitHub 仓库首页展开，不需要跳转到另一个文件。
+
+### `WORKSPACE_GUIDE.md`
+
+这是中英文合并的完整工作区指南，也是理解工作区结构和维护方式的主要入口。
+
+### `.gitignore`
+
+负责避免把 `.env`、密钥、生成输出、日志、缓存、虚拟环境、大型模型文件和具体私有任务纳入根仓库。
+
+### `.gitattributes`
+
+负责统一跨 Windows 和 Unix 环境的文本换行及二进制文件处理方式，减少无意义 Git 差异。
+
+### `WORKSPACE_STATUS.md`
+
+这是自动生成的当前状态摘要。工作区结构或维护模型发生较大变化后，运行以下命令刷新：
+
+```powershell
+python tools/generate_workspace_status.py
+```
+
+## 4. 共享可复用组件
+
+### `skills/`
+
+存放跨多个任务可复用的技能卡。只有在多个任务中反复证明有价值的能力才应放在根 `skills/`。
+
+当前通用 skills 包括：
+
+- `code_review/`
+- `python_project_setup/`
+- `cli_tool_setup/`
+- `linux_debugging/`
+- `documentation_writer/`
+- `visual_design_review/`
+
+只对某个任务有用的 skill、经验或检查清单应放在：
+
+```text
+tasks/<task_name>/docs/skills/
+```
+
+### `sops/`
+
+存放标准操作流程，例如新建任务、调试、修改已有项目、接入外部 API、任务收尾、安全命令、Git 提交和工作区维护。
+
+### `prompts/`
+
+存放给不同 agent 和工作场景使用的提示词模板。它们通常要求先读规则、限制修改范围、保护密钥、进行最小验证并汇报结果。
+
+## 5. 辅助脚本
+
+### `tools/workspace.py`
+
+这是推荐的统一入口：
+
+```powershell
+python tools/workspace.py new my_task
+python tools/workspace.py check
+python tools/workspace.py check --full
+```
+
+- `new`：创建隔离的正式任务目录。
+- `check`：执行日常只读检查。
+- `check --full`：刷新维护报告并执行完整检查。
+
+### 其他主要工具
+
+- `tools/make_task.py`：创建任务骨架。
+- `tools/check_workspace.py`：检查工作区基础结构和策略。
+- `tools/audit_git_readiness.py`：检查大文件、敏感命名和疑似 secret。
+- `tools/audit_line_endings.py`：检查 `.gitattributes` 换行策略。
+- `tools/test_workspace_tools.py`：运行工作区工具回归测试。
+- `tools/generate_workspace_status.py`：刷新 `WORKSPACE_STATUS.md`。
+- `tools/run_workspace_maintenance.py`：运行完整维护链。
+
+## 6. 环境说明
+
+### `envs/`
+
+这里存放如何安全使用本地工具和环境的说明，而不是未知安装脚本。当前覆盖 Python、Node.js、Codex CLI、Claude Code、OpenCode、Aider 和外部 API。
+
+环境文件用于记录：
+
+- 使用约定
+- 本地工作流
+- 安全配置方式
+- 不包含真实 secret 的 provider 配置方式
+
+## 7. Secrets 策略
+
+### `secrets/`
+
+这个目录只存放模板：
+
+- 不保存真实 API key、token、SSH key 或密码。
+- 真实凭据应放在系统环境变量或密码管理器中。
+- `secrets/env.example` 只保留变量名和空值。
+- Agent 不应打印、保存或提交真实凭据。
+
+## 8. 正式任务系统
+
+### `tasks/`
+
+所有正式任务都应该放在 `tasks/<task_name>/` 下。每个任务应拥有自己的规则、目标、源码、测试、输出、日志和文档。
+
+具体任务目录默认被根 `.gitignore` 排除，只在本地保存。根仓库只跟踪 `tasks/README.md` 作为政策说明。
+
+需要发布某个任务时，应先人工审查，然后在该任务目录内部初始化独立 Git 仓库，不得把具体任务加入 workspace 根仓库。
+
+## 9. Sandboxes 与 Archives
+
+### `sandboxes/`
+
+用于快速原型、一次性验证和临时环境实验。具体实验永远不应上传根仓库。
+
+### `archives/`
+
+用于已完成或明确废弃的任务。具体归档任务仍然保持本地私有；需要发布时使用独立仓库。
+
+## 10. 外部 Agent 工具
+
+Git 已用于跟踪工作区框架。Codex、Claude Code、OpenCode 和 Aider 的全局插件或 skills 位于本仓库之外，可能独立变化。
+
+推荐在具体任务目录中启动 agent，例如：
+
+```powershell
+cd D:\MaHong\agent_workspace\tasks\my_task_name
+opencode .
+```
+
+## 11. 推荐日常工作流
+
+1. 在根目录运行 `python tools/workspace.py new <task_name>`。
+2. 填写 `tasks/<task_name>/task.md`。
+3. 进入该任务目录。
+4. 让 agent 读取根规则和任务规则。
+5. 除非确有必要，否则只修改当前任务目录。
+6. 把任务私有 skill 放在 `docs/skills/`。
+7. 每次有意义修改后进行最小验证。
+8. 完成后更新总结，需要时再归档。
+
+## 12. 维护规则
+
+- 根目录文件保持通用和可复用。
+- 任务细节只放在任务目录。
+- 只有重复出现的能力才提升为根级 skill。
+- 工具使用方式变化时同步更新 `envs/`。
+- `secrets/env.example` 只维护变量名。
+- 大范围框架修改前运行 `python tools/workspace.py check --full`。
+
+## 13. 总结
+
+这个 workspace 的价值来自各部分协同：
+
+- 根规则约束行为。
+- prompts 规范执行入口。
+- SOP 固化流程。
+- tools 降低建任务和检查成本。
+- tasks 隔离正式工作。
+- `docs/skills/` 承接任务私有知识。
+- 根 `skills/` 承接跨任务公共能力。
+- secrets 保护敏感信息。
+- envs 连接本地工具和安全工作流。
+
+把这份文档作为理解整个 workspace 的单一入口，并在结构或工作模式发生实质变化时同步更新。
+
+</details>
