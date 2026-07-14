@@ -4,12 +4,14 @@ Use this SOP after broad workspace edits, before handoff, and periodically while
 
 ## Procedure
 
-1. Run `python tools/run_workspace_maintenance.py`.
-2. Review `WORKSPACE_STATUS.md`.
-3. Review `outputs/first_commit_recommendation.md` before staging or committing.
-4. Run `git ls-files tasks` and confirm only intended public task placeholders are tracked.
+1. Run `python tools/workspace.py check` for a quick, read-only routine check.
+2. Run `python tools/workspace.py check --full` before broad framework commits or handoff.
+3. Review `WORKSPACE_STATUS.md` and `outputs/first_commit_recommendation.md` after a full check.
+4. Run `git ls-files tasks archives sandboxes` and confirm only intended public policy placeholders are tracked.
 5. Update root docs when the workspace structure, tools, SOPs, prompts, or safety model changes.
 6. Keep task-specific details inside task folders unless the knowledge is reusable across tasks.
+
+Create a new private task with `python tools/workspace.py new my_task`.
 
 ## When To Run
 

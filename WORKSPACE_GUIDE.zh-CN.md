@@ -21,6 +21,14 @@
 - 流程可复用
 - 文档可读、可维护
 
+日常统一入口：
+
+```powershell
+python tools/workspace.py new my_task
+python tools/workspace.py check
+python tools/workspace.py check --full
+```
+
 ## 2. 当前根目录结构
 
 当前工作区根目录包含：
@@ -222,7 +230,7 @@ python tools/make_task.py task_name
 - 再遵守 task 局部规则
 - 局部规则只能补充或收紧全局规则
 
-具体任务目录默认被 `.gitignore` 排除。任务状态、登记表和清理说明优先放在任务目录内部；只有确认内容适合公开和复用时，再添加精确的 Git 例外。
+具体任务目录默认被 `.gitignore` 排除。任务状态、登记表和清理说明应保留在任务目录内部。需要发布时，经过人工审查后在该任务目录内初始化独立 Git 仓库，不得修改根 `.gitignore` 将具体任务加入 workspace 仓库。
 
 ### `tools/check_workspace.py`
 
@@ -473,7 +481,7 @@ Git 默认只跟踪：
 
 - `tasks/README.md`
 
-具体任务目录不默认入库。这样可以降低误提交私人项目上下文、生成产物、媒体文件和本地笔记的风险。需要共享某个任务时，应先人工审查内容，再添加窄范围例外。
+具体任务目录不进入 workspace 根仓库。这样可以降低误提交私人项目上下文、生成产物、媒体文件和本地笔记的风险。需要共享某个任务时，应先人工审查，并在该任务目录内初始化独立 Git 仓库。
 
 ## 9. Sandboxes 与 Archives
 
@@ -491,6 +499,8 @@ Git 默认只跟踪：
 ### `archives/`
 
 这里用于存放已经完成或明确废弃的任务。
+
+具体归档任务仍然对 workspace 根仓库保持私有并被 Git 忽略。需要发布时，只能在选定任务目录内建立独立 Git 仓库。
 
 ## 10. 已接入的外部 agent 工具
 
@@ -518,19 +528,13 @@ opencode .
 
 ### Codex 全局技能
 
-在 workspace 仓库外，你当前的 Codex 用户环境还额外安装了这些技能，位于 `C:\Users\MaHong\.codex\skills`：
-
-- `cli-creator`
-- `jupyter-notebook`
-- `playwright`
-- `screenshot`
-- `security-best-practices`
+Codex 全局 skill 和插件位于本仓库之外，可能独立变化。需要时应从当前 Codex 会话查询；本 workspace 自己维护的 skill 清单以自动生成的 `WORKSPACE_STATUS.md` 为准。
 
 ## 11. 推荐日常工作流
 
 推荐的日常路径是：
 
-1. 在 workspace 根目录运行 `python tools/make_task.py <task_name>`
+1. 在 workspace 根目录运行 `python tools/workspace.py new <task_name>`
 2. 填写 `tasks/<task_name>/task.md`
 3. 进入该任务目录
 4. 选择一个 agent 开始工作

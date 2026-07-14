@@ -15,7 +15,7 @@ This workspace is a personal, reusable home for learning and using Codex, Claude
 - `tasks/`: formal task folders for local work; concrete task folders are ignored by Git by default.
 - `tasks/README.md`: tracked placeholder explaining the private task-folder policy.
 - `sandboxes/`: temporary experiments.
-- `archives/`: completed or abandoned task archives.
+- `archives/`: completed or abandoned task archives; concrete archive folders remain local-private.
 - `secrets/`: templates only, never real secrets.
 
 ## How to create a new task
@@ -23,10 +23,10 @@ This workspace is a personal, reusable home for learning and using Codex, Claude
 Run:
 
 ```bash
-python tools/make_task.py my_task_name
+python tools/workspace.py new my_task
 ```
 
-This creates `tasks/my_task_name/` with task-level docs, source folders, test folders, output folders, and local ignore rules.
+This creates `tasks/my_task/` with task-level docs, source folders, test folders, output folders, and local ignore rules.
 
 Concrete task folders stay local by default. Keep task status, registries, and cleanup notes inside the task folder unless you deliberately decide to publish them.
 
@@ -36,24 +36,16 @@ Concrete task folders remain private to the root workspace repository. When a ta
 
 ## How to check before committing
 
-Run:
+Run the quick, read-only check during routine framework work:
 
 ```bash
-python tools/check_workspace.py
-python tools/audit_git_readiness.py
-python tools/audit_line_endings.py --strict
-python tools/test_workspace_tools.py
-python tools/summarize_git_candidates.py
-python tools/prepare_baseline_report.py
-python tools/verify_baseline_report.py
-python tools/generate_workspace_status.py
-python tools/verify_workspace_status.py
+python tools/workspace.py check
 ```
 
-Or run the full maintenance chain:
+Before a broad framework commit, run the full check that also regenerates maintenance reports:
 
 ```bash
-python tools/run_workspace_maintenance.py
+python tools/workspace.py check --full
 ```
 
 The readiness audit reports large Git candidates, sensitive-looking file names, and secret-like content without printing secret values.
@@ -61,7 +53,7 @@ Use `python tools/audit_git_readiness.py --max-mb 1` for a stricter large-file r
 The baseline recommendation report is written to `outputs/first_commit_recommendation.md`.
 The workspace status summary is regenerated in `WORKSPACE_STATUS.md`.
 For the first commit or any broad structural commit, follow `sops/git_first_commit.md`.
-For routine workspace upkeep, follow `sops/workspace_maintenance.md`.
+For individual compatibility commands and the detailed procedure, follow `sops/workspace_maintenance.md`.
 
 ## Notes for Chinese docs on Windows
 
@@ -108,5 +100,5 @@ Get-Content -Raw -Encoding UTF8 WORKSPACE_GUIDE.zh-CN.md
 
 1. Finish the task and write a short `summary.md` if needed.
 2. Move final deliverables into the task's `docs/` or `outputs/`.
-3. Move the task folder into `archives/` only when it is complete or intentionally abandoned.
+3. Move the task folder into `archives/` only when it is complete or intentionally abandoned; this does not make it public to the root repository.
 4. Keep enough notes so the task can be understood later without re-running everything.

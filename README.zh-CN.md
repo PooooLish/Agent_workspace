@@ -15,7 +15,7 @@
 - `tasks/`：正式任务目录；具体任务文件夹默认只保留在本地，不进入 Git。
 - `tasks/README.md`：被 Git 跟踪的占位说明，用来记录任务目录的私有策略。
 - `sandboxes/`：临时实验目录。
-- `archives/`：已完成或废弃任务的归档目录。
+- `archives/`：已完成或废弃任务的归档目录；具体归档任务默认只保留在本地。
 - `secrets/`：只放模板，不放真实密钥。
 
 ## 规则层级
@@ -30,7 +30,7 @@
 应在工作区根目录执行：
 
 ```bash
-python tools/make_task.py my_task_name
+python tools/workspace.py new my_task
 ```
 
 建议把“创建任务”这一步放在 `D:\MaHong\agent_workspace` 这个根目录上下文里完成，而不是放在 `tasks/` 目录里。
@@ -42,6 +42,7 @@ tasks/my_task_name/
 ├── AGENTS.md
 ├── task.md
 ├── README.md
+├── summary.md
 ├── src/
 ├── scripts/
 ├── data/
@@ -53,7 +54,11 @@ tasks/my_task_name/
 └── docs/skills/
 ```
 
-具体任务目录默认被 `.gitignore` 排除。任务状态、登记表和清理说明优先放在任务目录内部，只有确认可以公开复用时再单独加入版本库。
+具体任务目录默认被 `.gitignore` 排除。任务状态、登记表和清理说明应保留在任务目录内部。需要发布时，经过人工审查后在该任务目录内初始化独立 Git 仓库，不得加入 workspace 根仓库。
+
+## 独立发布任务
+
+具体任务和归档任务始终对 workspace 根仓库保持私有。只有用户明确选择某个任务后，才能按照 `sops/publish_independent_task.md` 在任务目录内初始化独立 Git 仓库并单独发布。
 
 ## 如何在 task 中使用 Codex / Claude Code / OpenCode / Aider
 
@@ -119,27 +124,19 @@ opencode .
 
 ## 提交前如何检查
 
-推荐运行：
+日常修改框架时，运行只读快速检查：
 
 ```powershell
-python tools/check_workspace.py
-python tools/audit_git_readiness.py
-python tools/audit_line_endings.py --strict
-python tools/test_workspace_tools.py
-python tools/summarize_git_candidates.py
-python tools/prepare_baseline_report.py
-python tools/verify_baseline_report.py
-python tools/generate_workspace_status.py
-python tools/verify_workspace_status.py
+python tools/workspace.py check
 ```
 
-也可以直接运行完整维护链：
+大范围框架提交前，运行会刷新维护报告的完整检查：
 
 ```powershell
-python tools/run_workspace_maintenance.py
+python tools/workspace.py check --full
 ```
 
-baseline 推荐报告写入 `outputs/first_commit_recommendation.md`，该文件默认被 Git 忽略。大范围结构提交前，优先看这个报告和 `WORKSPACE_STATUS.md`，并确认 `git ls-files tasks` 只包含有意公开的任务占位文件。
+baseline 推荐报告写入 `outputs/first_commit_recommendation.md`，该文件默认被 Git 忽略。详细步骤与兼容命令见 `sops/workspace_maintenance.md`。
 
 ## secrets 的处理方式
 
@@ -162,5 +159,5 @@ baseline 推荐报告写入 `outputs/first_commit_recommendation.md`，该文件
 1. 完成任务后运行最小最终验证。
 2. 在任务目录里补充 `summary.md`（如果需要）。
 3. 把稳定产物放到 `docs/` 或 `outputs/`。
-4. 任务完成或废弃后，再移动到 `archives/`。
+4. 任务完成或废弃后，再移动到 `archives/`；归档不会让任务进入根仓库。
 5. 保留足够说明，保证以后不重新跑也能理解任务结果。

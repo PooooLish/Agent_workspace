@@ -21,6 +21,14 @@ The design philosophy is:
 - reusable workflows
 - human-readable documentation
 
+Primary commands:
+
+```powershell
+python tools/workspace.py new my_task
+python tools/workspace.py check
+python tools/workspace.py check --full
+```
+
 ## 2. Current Root Structure
 
 The workspace currently contains:
@@ -527,14 +535,14 @@ The tracked task placeholder is:
 
 - `tasks/README.md`
 
-Use task-local files for active task status, registries, and cleanup notes. Publish a task file only after reviewing it deliberately and adding a narrow Git ignore exception.
+Use task-local files for active task status, registries, and cleanup notes. Publish a selected task only after deliberate review by initializing an independent Git repository inside that task directory.
 
 When creating a new formal task:
 
 1. Create the task with `python tools/make_task.py <task_name>`.
 2. Fill in `tasks/<task_name>/task.md`.
 3. Keep task-specific status details inside the task folder.
-4. Leave the task folder ignored unless you intentionally decide it is safe to publish.
+4. Leave the task folder ignored by the root repository; use an independent task repository when publication is approved.
 
 ## 9. Sandboxes and Archives
 
@@ -562,6 +570,8 @@ A task should move here only after:
 - useful outputs are preserved
 
 Both `sandboxes/` and `archives/` include local README files so their purpose remains visible in the Git baseline even when they contain no active experiment or archived task.
+
+Concrete archived task folders remain local-private and ignored by the workspace root repository.
 
 ## 10. Installed External Agent Tooling
 
@@ -591,21 +601,13 @@ opencode .
 
 ### Global Codex skills
 
-Outside the workspace repo, your Codex user environment currently also has these installed under `C:\Users\MaHong\.codex\skills`:
-
-- `cli-creator`
-- `jupyter-notebook`
-- `playwright`
-- `screenshot`
-- `security-best-practices`
-
-These extend Codex itself rather than the workspace directory, but they are part of your practical setup.
+Global Codex skills and plugins live outside this repository and can change independently. Inspect the current Codex session when that inventory matters; use `WORKSPACE_STATUS.md` as the generated source for skills owned by this workspace.
 
 ## 11. Recommended Daily Workflow
 
 The intended day-to-day workflow is:
 
-1. Create a task with `python tools/make_task.py <task_name>`.
+1. Create a task with `python tools/workspace.py new <task_name>`.
 2. Fill in `tasks/<task_name>/task.md`.
 3. Enter that task folder.
 4. Start the agent of choice.
@@ -665,58 +667,12 @@ Good next improvements would be:
 
 ## 15. Quick Reference
 
-Create a task:
+Use the unified workspace front door:
 
 ```bash
-python tools/make_task.py my_task
-```
-
-Check the workspace:
-
-```bash
-python tools/check_workspace.py
-```
-
-Audit Git readiness:
-
-```bash
-python tools/audit_git_readiness.py
-```
-
-Summarize Git candidates:
-
-```bash
-python tools/summarize_git_candidates.py
-```
-
-Prepare baseline report:
-
-```bash
-python tools/prepare_baseline_report.py
-```
-
-Regenerate workspace status:
-
-```bash
-python tools/generate_workspace_status.py
-```
-
-Run full workspace maintenance:
-
-```bash
-python tools/run_workspace_maintenance.py
-```
-
-Verify baseline report:
-
-```bash
-python tools/verify_baseline_report.py
-```
-
-Verify workspace status:
-
-```bash
-python tools/verify_workspace_status.py
+python tools/workspace.py new my_task
+python tools/workspace.py check
+python tools/workspace.py check --full
 ```
 
 Launch OpenCode in a task:
