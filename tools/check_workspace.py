@@ -59,6 +59,8 @@ REQUIRED_IGNORED_PATHS = [
     "tasks/private_example/node_modules/package/index.js",
     "tasks/private_example/AGENTS.md",
     "sandboxes/private_example/test.txt",
+    "archives/private_example/summary.md",
+    ".superpowers/sdd/progress.md",
 ]
 
 REQUIRED_TASK_ITEMS = [

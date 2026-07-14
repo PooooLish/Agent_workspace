@@ -30,6 +30,13 @@ tasks/*
 sandboxes/*
 !sandboxes/README.md
 
+# Completed task archives remain local-private; keep only the policy placeholder public.
+archives/*
+!archives/README.md
+
+# Local Superpowers execution state is not reusable framework content.
+.superpowers/
+
 *.zip
 *.tar
 *.tar.gz

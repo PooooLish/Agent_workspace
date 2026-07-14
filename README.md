@@ -15,7 +15,7 @@ This workspace is a personal, reusable home for learning and using Codex, Claude
 - `tasks/`: formal task folders for local work; concrete task folders are ignored by Git by default.
 - `tasks/README.md`: tracked placeholder explaining the private task-folder policy.
 - `sandboxes/`: temporary experiments.
-- `archives/`: completed or abandoned task archives.
+- `archives/`: completed or abandoned task archives; concrete archive folders remain local-private.
 - `secrets/`: templates only, never real secrets.
 
 ## How to create a new task
@@ -108,5 +108,5 @@ Get-Content -Raw -Encoding UTF8 WORKSPACE_GUIDE.zh-CN.md
 
 1. Finish the task and write a short `summary.md` if needed.
 2. Move final deliverables into the task's `docs/` or `outputs/`.
-3. Move the task folder into `archives/` only when it is complete or intentionally abandoned.
+3. Move the task folder into `archives/` only when it is complete or intentionally abandoned; this does not make it public to the root repository.
 4. Keep enough notes so the task can be understood later without re-running everything.

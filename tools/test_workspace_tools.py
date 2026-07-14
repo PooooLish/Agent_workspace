@@ -125,6 +125,35 @@ class CheckWorkspaceTests(unittest.TestCase):
         self.assertTrue(self.check_workspace.is_git_ignored(ROOT, "sandboxes/private_example/test.txt"))
         self.assertFalse(self.check_workspace.is_git_ignored(ROOT, "sandboxes/README.md"))
 
+    def test_archives_are_private_by_default(self) -> None:
+        self.assertTrue(self.check_workspace.is_git_ignored(ROOT, "archives/private_example/summary.md"))
+        self.assertFalse(self.check_workspace.is_git_ignored(ROOT, "archives/README.md"))
+
+    def test_superpowers_runtime_state_is_ignored(self) -> None:
+        self.assertTrue(self.check_workspace.is_git_ignored(ROOT, ".superpowers/sdd/progress.md"))
+
+    def test_publication_docs_require_independent_repository(self) -> None:
+        docs = [
+            "README.md",
+            "README.zh-CN.md",
+            "WORKSPACE_GUIDE.md",
+            "WORKSPACE_GUIDE.zh-CN.md",
+            "tasks/README.md",
+            "sops/publish_independent_task.md",
+        ]
+        forbidden = (
+            "narrow Git ignore exception",
+            "narrow ignore-rule exception",
+            "精确的 Git 例外",
+            "单独加入版本库",
+        )
+        for relative_path in docs:
+            text = (ROOT / relative_path).read_text(encoding="utf-8")
+            with self.subTest(relative_path=relative_path):
+                self.assertTrue("independent" in text.lower() or "独立 Git 仓库" in text)
+                for phrase in forbidden:
+                    self.assertNotIn(phrase, text)
+
     def test_tool_scripts_are_registered_and_documented(self) -> None:
         required_items = set(self.check_workspace.required_items(ROOT))
         status_text = (ROOT / "WORKSPACE_STATUS.md").read_text(encoding="utf-8")

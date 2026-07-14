@@ -15,7 +15,7 @@
 - `tasks/`：正式任务目录；具体任务文件夹默认只保留在本地，不进入 Git。
 - `tasks/README.md`：被 Git 跟踪的占位说明，用来记录任务目录的私有策略。
 - `sandboxes/`：临时实验目录。
-- `archives/`：已完成或废弃任务的归档目录。
+- `archives/`：已完成或废弃任务的归档目录；具体归档任务默认只保留在本地。
 - `secrets/`：只放模板，不放真实密钥。
 
 ## 规则层级
@@ -53,7 +53,11 @@ tasks/my_task_name/
 └── docs/skills/
 ```
 
-具体任务目录默认被 `.gitignore` 排除。任务状态、登记表和清理说明优先放在任务目录内部，只有确认可以公开复用时再单独加入版本库。
+具体任务目录默认被 `.gitignore` 排除。任务状态、登记表和清理说明应保留在任务目录内部。需要发布时，经过人工审查后在该任务目录内初始化独立 Git 仓库，不得加入 workspace 根仓库。
+
+## 独立发布任务
+
+具体任务和归档任务始终对 workspace 根仓库保持私有。只有用户明确选择某个任务后，才能按照 `sops/publish_independent_task.md` 在任务目录内初始化独立 Git 仓库并单独发布。
 
 ## 如何在 task 中使用 Codex / Claude Code / OpenCode / Aider
 
@@ -162,5 +166,5 @@ baseline 推荐报告写入 `outputs/first_commit_recommendation.md`，该文件
 1. 完成任务后运行最小最终验证。
 2. 在任务目录里补充 `summary.md`（如果需要）。
 3. 把稳定产物放到 `docs/` 或 `outputs/`。
-4. 任务完成或废弃后，再移动到 `archives/`。
+4. 任务完成或废弃后，再移动到 `archives/`；归档不会让任务进入根仓库。
 5. 保留足够说明，保证以后不重新跑也能理解任务结果。

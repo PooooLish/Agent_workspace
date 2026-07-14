@@ -527,14 +527,14 @@ The tracked task placeholder is:
 
 - `tasks/README.md`
 
-Use task-local files for active task status, registries, and cleanup notes. Publish a task file only after reviewing it deliberately and adding a narrow Git ignore exception.
+Use task-local files for active task status, registries, and cleanup notes. Publish a selected task only after deliberate review by initializing an independent Git repository inside that task directory.
 
 When creating a new formal task:
 
 1. Create the task with `python tools/make_task.py <task_name>`.
 2. Fill in `tasks/<task_name>/task.md`.
 3. Keep task-specific status details inside the task folder.
-4. Leave the task folder ignored unless you intentionally decide it is safe to publish.
+4. Leave the task folder ignored by the root repository; use an independent task repository when publication is approved.
 
 ## 9. Sandboxes and Archives
 
@@ -562,6 +562,8 @@ A task should move here only after:
 - useful outputs are preserved
 
 Both `sandboxes/` and `archives/` include local README files so their purpose remains visible in the Git baseline even when they contain no active experiment or archived task.
+
+Concrete archived task folders remain local-private and ignored by the workspace root repository.
 
 ## 10. Installed External Agent Tooling
 
