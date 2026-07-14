@@ -1,6 +1,6 @@
 # Workspace Status
 
-Last generated: 2026-07-11
+Last generated: 2026-07-14
 
 This file records the current operating state of `D:\MaHong\agent_workspace`.
 
@@ -12,15 +12,15 @@ python tools/generate_workspace_status.py
 
 ## Current Health
 
-- Structure check: passing.
+- Structure check: failing with exit code 2.
 - Git readiness audit: passing.
-- Workspace baseline recommendation: available in `outputs/first_commit_recommendation.md`.
-- Git candidate files: 79.
-- Git candidate size: about 0.26 MB.
-- Recommended baseline files: 62.
+- Workspace baseline recommendation: missing in `outputs/first_commit_recommendation.md`.
+- Git candidate files: 70.
+- Git candidate size: about 0.21 MB.
+- Recommended baseline files: 0.
 - Manual confirmation items for baseline review: 0.
 - Confirmed public/site assets included: 0.
-- Line ending drift reminders: 5.
+- Line ending drift reminders: 0.
 - Strict 1 MB large-file reminders: 0.
 
 ## Core Commands
@@ -59,6 +59,7 @@ python tools/audit_git_readiness.py --max-mb 1
 - `tools/verify_baseline_report.py`: verifies that the baseline recommendation matches current Git candidates.
 - `tools/verify_first_commit_report.py`: legacy-compatible implementation behind the baseline report verifier.
 - `tools/verify_workspace_status.py`: verifies that `WORKSPACE_STATUS.md` matches the current generated status.
+- `tools/workspace.py`: provides the unified task creation and quick/full workspace check commands.
 - `tools/workspace_manifest.py`: centralizes shared workspace tool metadata and maintenance command lists.
 
 ## Current Skills
@@ -110,7 +111,7 @@ python tools/audit_git_readiness.py --max-mb 1
 
 ## Git Baseline Notes
 
-The current baseline recommendation treats all 62 recommended files as baseline candidates.
+The current baseline recommendation treats all 0 recommended files as baseline candidates.
 
 Repository normalization is governed by `.gitattributes`:
 

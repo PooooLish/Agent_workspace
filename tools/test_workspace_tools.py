@@ -326,6 +326,37 @@ class WorkspaceStatusTests(unittest.TestCase):
         self.assertNotIn("narrow ignore-rule exception", status)
 
 
+class WorkspaceCommandTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.workspace = load_tool("workspace")
+
+    def test_quick_checks_are_read_only(self) -> None:
+        commands = [step.command for step in self.workspace.QUICK_CHECK_STEPS]
+        flattened = [part for command in commands for part in command]
+        self.assertNotIn("tools/generate_workspace_status.py", flattened)
+        self.assertNotIn("tools/prepare_baseline_report.py", flattened)
+
+    def test_full_checks_generate_and_verify_reports(self) -> None:
+        scripts = [step.command[1] for step in self.workspace.FULL_CHECK_STEPS if len(step.command) > 1]
+        self.assertIn("tools/prepare_baseline_report.py", scripts)
+        self.assertIn("tools/verify_baseline_report.py", scripts)
+        self.assertIn("tools/generate_workspace_status.py", scripts)
+        self.assertIn("tools/verify_workspace_status.py", scripts)
+
+    def test_run_steps_propagates_failure(self) -> None:
+        calls: list[list[str]] = []
+
+        def runner(command, **kwargs):
+            calls.append(command)
+            return subprocess.CompletedProcess(command, 7)
+
+        code = self.workspace.run_steps(ROOT, self.workspace.QUICK_CHECK_STEPS[:1], runner=runner)
+
+        self.assertEqual(code, 7)
+        self.assertEqual(len(calls), 1)
+
+
 class FirstCommitVerificationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
