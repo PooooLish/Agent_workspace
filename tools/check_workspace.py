@@ -40,8 +40,17 @@ REQUIRED_GITIGNORE_PATTERNS = [
     "**/node_modules/",
     "tasks/*",
     "sandboxes/*",
+    "archives/*",
+    ".superpowers/",
     "*.mp4",
 ]
+
+PRIVATE_ROOTS = ("tasks", "sandboxes", "archives")
+PUBLIC_PRIVATE_AREA_PLACEHOLDERS = {
+    "tasks/README.md",
+    "sandboxes/README.md",
+    "archives/README.md",
+}
 
 REQUIRED_GITATTRIBUTES_PATTERNS = [
     "* text=auto eol=lf",
@@ -123,6 +132,32 @@ def get_git_candidate_paths(root: Path) -> list[str]:
     if result.returncode != 0:
         return []
     return [path for path in result.stdout.split("\0") if path]
+
+
+def unexpected_tracked_private_paths(paths: list[str]) -> list[str]:
+    unexpected: list[str] = []
+    for raw_path in paths:
+        path = raw_path.replace("\\", "/")
+        if path in PUBLIC_PRIVATE_AREA_PLACEHOLDERS:
+            continue
+        if any(path.startswith(f"{root}/") for root in PRIVATE_ROOTS):
+            unexpected.append(path)
+    return sorted(unexpected)
+
+
+def get_tracked_private_paths(root: Path) -> list[str]:
+    result = subprocess.run(
+        ["git", "ls-files", "-z", "--", *PRIVATE_ROOTS],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or "git ls-files failed")
+    return unexpected_tracked_private_paths([path for path in result.stdout.split("\0") if path])
 
 
 def is_git_ignored(root: Path, relative_path: str) -> bool:
@@ -432,6 +467,11 @@ def main() -> int:
             check_private_task_index_quality(root, index_text, task_dirs, warnings)
 
     check_required_ignored_paths(root, warnings)
+    try:
+        for relative_path in get_tracked_private_paths(root):
+            warnings.append(f"private workspace content is tracked by root Git: {relative_path}")
+    except RuntimeError as error:
+        warnings.append(f"could not inspect tracked private workspace paths: {error}")
     check_tool_registry(root, warnings)
     check_skill_registry(root, warnings)
     check_sop_registry(root, warnings)

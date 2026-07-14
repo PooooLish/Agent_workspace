@@ -168,6 +168,9 @@ coverage/
 
 
 def scaffold_task(workspace_root: Path, task_name: str) -> tuple[list[str], list[str]]:
+    if not TASK_NAME_RE.fullmatch(task_name):
+        raise ValueError("task_name must start with a letter or number and contain only letters, numbers, underscores, or hyphens")
+
     tasks_root = workspace_root / "tasks"
     task_root = tasks_root / task_name
     resolved_task_root = task_root.resolve()

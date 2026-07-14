@@ -91,6 +91,15 @@ class MakeTaskTests(unittest.TestCase):
             for heading in ("## Goal", "## Outcome", "## Changes", "## Verification", "## Open issues"):
                 self.assertIn(heading, summary)
 
+    def test_scaffold_rejects_invalid_task_names(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tasks").mkdir()
+            for task_name in ("parent/child", "../escape", "has space"):
+                with self.subTest(task_name=task_name):
+                    with self.assertRaises(ValueError):
+                        self.make_task.scaffold_task(root, task_name)
+
 
 class GitReadinessTests(unittest.TestCase):
     @classmethod
@@ -171,6 +180,7 @@ class CheckWorkspaceTests(unittest.TestCase):
             "WORKSPACE_GUIDE.md",
             "WORKSPACE_GUIDE.zh-CN.md",
             "tasks/README.md",
+            "sops/git_first_commit.md",
             "sops/publish_independent_task.md",
         ]
         forbidden = (
@@ -178,6 +188,7 @@ class CheckWorkspaceTests(unittest.TestCase):
             "narrow ignore-rule exception",
             "精确的 Git 例外",
             "单独加入版本库",
+            "窄范围例外",
         )
         for relative_path in docs:
             text = (ROOT / relative_path).read_text(encoding="utf-8")
@@ -185,6 +196,21 @@ class CheckWorkspaceTests(unittest.TestCase):
                 self.assertTrue("independent" in text.lower() or "独立 Git 仓库" in text)
                 for phrase in forbidden:
                     self.assertNotIn(phrase, text)
+
+    def test_tracked_private_content_is_rejected(self) -> None:
+        paths = [
+            "tasks/README.md",
+            "tasks/private/source.py",
+            "sandboxes/README.md",
+            "sandboxes/demo/result.txt",
+            "archives/README.md",
+            "archives/old/summary.md",
+        ]
+        self.assertEqual(
+            self.check_workspace.unexpected_tracked_private_paths(paths),
+            ["archives/old/summary.md", "sandboxes/demo/result.txt", "tasks/private/source.py"],
+        )
+        self.assertEqual(self.check_workspace.get_tracked_private_paths(ROOT), [])
 
     def test_tool_scripts_are_registered_and_documented(self) -> None:
         required_items = set(self.check_workspace.required_items(ROOT))
@@ -346,6 +372,15 @@ class WorkspaceStatusTests(unittest.TestCase):
         self.assertIn("archives/README.md", status)
         self.assertIn("archived task path ignored by Git: yes", status)
 
+    def test_status_build_is_deterministic(self) -> None:
+        generator = self.verify_status.load_status_generator(ROOT)
+
+        first = generator.build_status(ROOT)
+        second = generator.build_status(ROOT)
+
+        self.assertEqual(first, second)
+        self.assertEqual(first, (ROOT / "WORKSPACE_STATUS.md").read_text(encoding="utf-8"))
+
 
 class WorkspaceCommandTests(unittest.TestCase):
     @classmethod
@@ -377,6 +412,24 @@ class WorkspaceCommandTests(unittest.TestCase):
 
         self.assertEqual(code, 7)
         self.assertEqual(len(calls), 1)
+
+    def test_reminder_failure_does_not_stop_later_steps(self) -> None:
+        steps = (
+            self.workspace.StepSpec("reminder", ("{python}", "reminder.py"), allow_nonzero=True),
+            self.workspace.StepSpec("required", ("{python}", "required.py")),
+        )
+        return_codes = iter((3, 0))
+        calls: list[list[str]] = []
+
+        def runner(command, **kwargs):
+            calls.append(command)
+            return subprocess.CompletedProcess(command, next(return_codes))
+
+        with redirect_stdout(io.StringIO()):
+            code = self.workspace.run_steps(ROOT, steps, runner=runner)
+
+        self.assertEqual(code, 0)
+        self.assertEqual(len(calls), 2)
 
 
 class FirstCommitVerificationTests(unittest.TestCase):

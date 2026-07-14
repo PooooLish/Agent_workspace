@@ -20,7 +20,7 @@ Use this SOP before creating the first workspace commit or any later broad struc
 - Do not stage dependency folders such as `node_modules/`.
 - Do not stage raw media, generated renders, logs, caches, or temporary files unless explicitly intended.
 - Do not stage local backup files such as `*.bak`; keep the canonical file instead.
-- Task files may be staged only after deliberate review and a narrow ignore-rule exception.
+- Concrete task files must not be staged in the workspace root repository. Publish an approved task only through an independent Git repository initialized inside that task directory.
 - Do not delete cleanup candidates without explicit approval.
 
 ## Expected report
