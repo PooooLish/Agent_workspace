@@ -173,6 +173,16 @@ class CheckWorkspaceTests(unittest.TestCase):
     def test_superpowers_runtime_state_is_ignored(self) -> None:
         self.assertTrue(self.check_workspace.is_git_ignored(ROOT, ".superpowers/sdd/progress.md"))
 
+    def test_root_superpowers_docs_are_ignored(self) -> None:
+        self.assertTrue(
+            self.check_workspace.is_git_ignored(ROOT, "docs/superpowers/specs/example-design.md")
+        )
+
+    def test_planning_artifact_gate_is_documented(self) -> None:
+        warnings: list[str] = []
+        self.check_workspace.check_planning_artifact_gate(ROOT, warnings)
+        self.assertEqual(warnings, [])
+
     def test_publication_docs_require_independent_repository(self) -> None:
         docs = [
             "README.md",
@@ -203,10 +213,16 @@ class CheckWorkspaceTests(unittest.TestCase):
             "sandboxes/demo/result.txt",
             "archives/README.md",
             "archives/old/summary.md",
+            "docs/superpowers/specs/root-noise.md",
         ]
         self.assertEqual(
             self.check_workspace.unexpected_tracked_private_paths(paths),
-            ["archives/old/summary.md", "sandboxes/demo/result.txt", "tasks/private/source.py"],
+            [
+                "archives/old/summary.md",
+                "docs/superpowers/specs/root-noise.md",
+                "sandboxes/demo/result.txt",
+                "tasks/private/source.py",
+            ],
         )
         self.assertEqual(self.check_workspace.get_tracked_private_paths(ROOT), [])
 
@@ -331,6 +347,15 @@ class WorkspaceStatusTests(unittest.TestCase):
             relative_path = str(path.relative_to(ROOT)).replace("\\", "/")
             with self.subTest(relative_path=relative_path):
                 self.assertIn(f"- `{relative_path}`:", status)
+
+    def test_status_generator_lists_framework_docs(self) -> None:
+        generator = self.verify_status.load_status_generator(ROOT)
+        status = generator.build_status(ROOT)
+
+        for item in generator.framework_doc_items(ROOT):
+            with self.subTest(item=item):
+                self.assertIn(item, status)
+        self.assertIn("root Superpowers document path ignored by Git: yes", status)
 
     def test_status_generator_has_tool_descriptions(self) -> None:
         generator = self.verify_status.load_status_generator(ROOT)

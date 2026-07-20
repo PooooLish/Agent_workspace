@@ -37,6 +37,9 @@ archives/*
 # Local Superpowers execution state is not reusable framework content.
 .superpowers/
 
+# Root-level Superpowers process artifacts are local noise; durable framework decisions use docs/framework/.
+/docs/superpowers/
+
 *.zip
 *.tar
 *.tar.gz

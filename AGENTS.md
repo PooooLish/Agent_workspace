@@ -48,6 +48,16 @@
 - Put task-specific skills, checklists, notes, and lessons in the task folder.
 - Promote a task-local skill into the root `skills/` directory only after it has proven reusable across multiple tasks.
 
+## Planning artifact gate
+
+- Classify the change before creating any standalone specification or implementation plan.
+- Simple, low-risk, localized work must be implemented directly after a short conversational plan; it must not create spec or plan files.
+- Treat documentation-only edits, small configuration changes, file moves, and obvious localized fixes as simple unless they introduce architectural or privacy risk.
+- Create a durable planning document only for complex, high-risk, ambiguous, cross-module work, or when I explicitly request one.
+- Framework-level decisions with lasting value belong in `docs/framework/`; do not create root-level `docs/superpowers/` content.
+- Task-specific specs and plans belong inside the owning task, preferably under `tasks/<task_name>/docs/superpowers/`.
+- Completed step-by-step plans should not be retained in the root repository unless they remain useful as an operating reference.
+
 ## File modification rules
 
 - Prefer creating new files instead of rewriting existing ones.

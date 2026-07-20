@@ -40,6 +40,12 @@ python tools/workspace.py check --full
 - `tools/workspace.py`: provides the unified task creation and quick/full workspace check commands.
 - `tools/workspace_manifest.py`: centralizes shared workspace tool metadata and maintenance command lists.
 
+## Current Framework Docs
+
+- `docs/README.md`
+- `docs/framework/git-task-isolation.md`
+- `docs/framework/workspace-efficiency.md`
+
 ## Current Skills
 
 - `skills/cli_tool_setup/SKILL.md`
@@ -102,6 +108,7 @@ Important exclusions are governed by `.gitignore`:
 - concrete sandbox experiments under `sandboxes/*`
 - concrete archived tasks under `archives/*`
 - local Superpowers execution state under `.superpowers/`
+- root-level Superpowers process artifacts under `docs/superpowers/`
 
 ## Private Workspace Areas
 
@@ -114,6 +121,7 @@ Important exclusions are governed by `.gitignore`:
 - Example archived task path ignored by Git: yes.
 - `archives/README.md` remains trackable: yes.
 - Example Superpowers runtime path ignored by Git: yes.
+- Example root Superpowers document path ignored by Git: yes.
 
 ## Ignored Generated Reports
 

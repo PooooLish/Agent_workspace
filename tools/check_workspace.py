@@ -10,6 +10,10 @@ REQUIRED_ITEMS = [
     "AGENTS.md",
     "README.md",
     "WORKSPACE_GUIDE.md",
+    "docs",
+    "docs/README.md",
+    "docs/framework/git-task-isolation.md",
+    "docs/framework/workspace-efficiency.md",
     ".gitattributes",
     ".gitignore",
     "WORKSPACE_STATUS.md",
@@ -40,10 +44,11 @@ REQUIRED_GITIGNORE_PATTERNS = [
     "sandboxes/*",
     "archives/*",
     ".superpowers/",
+    "/docs/superpowers/",
     "*.mp4",
 ]
 
-PRIVATE_ROOTS = ("tasks", "sandboxes", "archives")
+PRIVATE_ROOTS = ("tasks", "sandboxes", "archives", "docs/superpowers")
 PUBLIC_PRIVATE_AREA_PLACEHOLDERS = {
     "tasks/README.md",
     "sandboxes/README.md",
@@ -68,7 +73,16 @@ REQUIRED_IGNORED_PATHS = [
     "sandboxes/private_example/test.txt",
     "archives/private_example/summary.md",
     ".superpowers/sdd/progress.md",
+    "docs/superpowers/specs/example-design.md",
 ]
+
+PLANNING_GATE_REQUIRED_PHRASES = (
+    "## Planning artifact gate",
+    "Simple, low-risk, localized work",
+    "must not create spec or plan files",
+    "docs/framework/",
+    "tasks/<task_name>/docs/superpowers/",
+)
 
 REQUIRED_TASK_ITEMS = [
     "AGENTS.md",
@@ -175,6 +189,13 @@ def check_required_ignored_paths(root: Path, warnings: list[str]) -> None:
     for relative_path in REQUIRED_IGNORED_PATHS:
         if not is_git_ignored(root, relative_path):
             warnings.append(f"{relative_path} should be ignored by Git but is not")
+
+
+def check_planning_artifact_gate(root: Path, warnings: list[str]) -> None:
+    agents_text = (root / "AGENTS.md").read_text(encoding="utf-8")
+    for phrase in PLANNING_GATE_REQUIRED_PHRASES:
+        if phrase not in agents_text:
+            warnings.append(f"AGENTS.md planning artifact gate missing required phrase: {phrase}")
 
 
 def get_tool_script_paths(root: Path) -> list[str]:
@@ -465,6 +486,7 @@ def main() -> int:
             check_private_task_index_quality(root, index_text, task_dirs, warnings)
 
     check_required_ignored_paths(root, warnings)
+    check_planning_artifact_gate(root, warnings)
     try:
         for relative_path in get_tracked_private_paths(root):
             warnings.append(f"private workspace content is tracked by root Git: {relative_path}")

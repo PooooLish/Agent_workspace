@@ -13,6 +13,7 @@ This workspace is a personal, reusable home for learning and using Codex, Claude
 
 - `AGENTS.md`: root operating rules for all agents.
 - `.gitattributes`: text, line-ending, and binary-file normalization rules.
+- `docs/`: durable framework decisions and documentation placement rules.
 - `skills/`: reusable capability notes and playbooks.
 - `sops/`: standard operating procedures.
 - `prompts/`: copy-paste prompt templates for different agents.
@@ -126,6 +127,7 @@ Get-Content -Raw -Encoding UTF8 WORKSPACE_GUIDE.md
 - `AGENTS.md`：所有 agent 的根规则与安全边界。
 - `README.md`：中英文工作区总览。
 - `WORKSPACE_GUIDE.md`：中英文工作区完整指南。
+- `docs/`：长期有效的框架决策和文档归属规则。
 - `skills/`：可复用技能卡与方法说明。
 - `sops/`：标准操作流程。
 - `prompts/`：给不同 agent 直接复用的提示词模板。

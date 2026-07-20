@@ -36,6 +36,12 @@ def skill_file_items(root: Path) -> list[str]:
     ]
 
 
+def framework_doc_items(root: Path) -> list[str]:
+    paths = [root / "docs" / "README.md"]
+    paths.extend(sorted((root / "docs" / "framework").glob("*.md")))
+    return [f"- `{str(path.relative_to(root)).replace(chr(92), '/')}`" for path in paths if path.is_file()]
+
+
 def tool_file_items(root: Path) -> list[str]:
     items: list[str] = []
     for path in sorted((root / "tools").glob("*.py")):
@@ -53,6 +59,7 @@ def build_status(root: Path) -> str:
     archive_folder_ignored = is_ignored(root, "archives/private_example/summary.md")
     archive_placeholder_ignored = is_ignored(root, "archives/README.md")
     superpowers_ignored = is_ignored(root, ".superpowers/sdd/progress.md")
+    root_superpowers_docs_ignored = is_ignored(root, "docs/superpowers/specs/example-design.md")
     report_ignored = is_ignored(root, "outputs/first_commit_recommendation.md")
 
     sop_items = markdown_file_items(root, "sops")
@@ -60,6 +67,7 @@ def build_status(root: Path) -> str:
     env_items = markdown_file_items(root, "envs")
     skill_items = skill_file_items(root)
     tool_items = tool_file_items(root)
+    framework_docs = framework_doc_items(root)
 
     lines = [
         "# Workspace Status",
@@ -87,6 +95,10 @@ def build_status(root: Path) -> str:
         "## Current Tools",
         "",
         *tool_items,
+        "",
+        "## Current Framework Docs",
+        "",
+        *framework_docs,
         "",
         "## Current Skills",
         "",
@@ -124,6 +136,7 @@ def build_status(root: Path) -> str:
         "- concrete sandbox experiments under `sandboxes/*`",
         "- concrete archived tasks under `archives/*`",
         "- local Superpowers execution state under `.superpowers/`",
+        "- root-level Superpowers process artifacts under `docs/superpowers/`",
         "",
         "## Private Workspace Areas",
         "",
@@ -136,6 +149,7 @@ def build_status(root: Path) -> str:
         f"- Example archived task path ignored by Git: {'yes' if archive_folder_ignored else 'no'}.",
         f"- `archives/README.md` remains trackable: {'yes' if not archive_placeholder_ignored else 'no'}.",
         f"- Example Superpowers runtime path ignored by Git: {'yes' if superpowers_ignored else 'no'}.",
+        f"- Example root Superpowers document path ignored by Git: {'yes' if root_superpowers_docs_ignored else 'no'}.",
         "",
         "## Ignored Generated Reports",
         "",

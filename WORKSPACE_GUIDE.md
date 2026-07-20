@@ -43,6 +43,7 @@ The workspace currently contains:
 - `.gitattributes`
 - `.gitignore`
 - `.git/`
+- `docs/`
 - `skills/`
 - `sops/`
 - `prompts/`
@@ -81,6 +82,10 @@ The Chinese Markdown files are UTF-8. On Windows PowerShell, use explicit UTF-8 
 Get-Content -Raw -Encoding UTF8 README.md
 Get-Content -Raw -Encoding UTF8 WORKSPACE_GUIDE.md
 ```
+
+### `docs/`
+
+This directory contains durable root-framework documentation. `docs/README.md` defines placement rules, and `docs/framework/` contains lasting architecture and privacy decisions. Simple changes do not create standalone specs or plans, and task-specific planning belongs inside the owning task.
 
 ### `.gitignore`
 
@@ -270,6 +275,7 @@ What it checks:
 - `AGENTS.md`
 - `README.md`
 - `.gitignore`
+- `docs/`
 - `skills/`
 - `sops/`
 - `prompts/`
@@ -787,6 +793,10 @@ python tools/workspace.py check --full
 ### `WORKSPACE_GUIDE.md`
 
 这是中英文合并的完整工作区指南，也是理解工作区结构和维护方式的主要入口。
+
+### `docs/`
+
+这里仅存放长期有效的根框架文档。`docs/README.md` 说明文档归属规则，`docs/framework/` 保存架构和隐私边界决策。简单任务不创建独立 spec 或 plan，具体任务的设计与计划必须放入所属任务目录。
 
 ### `.gitignore`
 
