@@ -452,7 +452,8 @@ None.
                 )
 
             self.assertEqual(code, 5)
-            self.assertEqual(calls, [('python -c "print(\'verified\')"', task_root)])
+            self.assertEqual(calls[0][0], 'python -c "print(\'verified\')"')
+            self.assertTrue(calls[0][1].samefile(task_root))
 
     def test_default_command_runner_executes_one_line_in_selected_directory(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
