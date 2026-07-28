@@ -878,6 +878,40 @@ class WorkspaceCommandTests(unittest.TestCase):
             "complex",
         )
 
+    def test_status_compacts_legacy_multiline_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            task_root = root / "tasks" / "legacy"
+            task_root.mkdir(parents=True)
+            task_root.joinpath("task.md").write_text(
+                """# Task: legacy
+
+## Status
+
+Old free-form status
+with a second line that must not break the table.
+
+## Goal
+
+Legacy task.
+
+## Next action
+
+Continue a deliberately long historical action that should be truncated in the compact table output.
+""",
+                encoding="utf-8",
+            )
+
+            output = io.StringIO()
+            with redirect_stdout(output):
+                code = self.workspace.run_status(root)
+
+            self.assertEqual(code, 0)
+            lines = output.getvalue().splitlines()
+            self.assertEqual(len(lines), 3)
+            self.assertIn("legacy", lines[2])
+            self.assertIn("...", lines[2])
+
 
 class FirstCommitVerificationTests(unittest.TestCase):
     @classmethod

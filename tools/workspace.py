@@ -73,23 +73,34 @@ def run_new(root: Path, task_name: str, *, dry_run: bool, complexity: str) -> in
     return subprocess.run(command, cwd=root, check=False).returncode
 
 
+def compact_field(value: str, width: int, *, fallback: str = "unknown") -> str:
+    text = " ".join(value.split()) or fallback
+    if len(text) <= width:
+        return text
+    return text[: width - 3] + "..."
+
+
 def run_status(root: Path) -> int:
     names = discover_task_names(root)
     if not names:
         print("No private task directories found.")
         return 0
     print(f"{'Task':<28} {'Status':<12} {'Complexity':<12} {'Phase':<16} Next action")
-    print("-" * 96)
+    print("-" * 112)
     for name in names:
         try:
             task = load_task(root, name)
         except ValueError as error:
-            print(f"{name:<28} invalid      -            -                {error}")
+            error_text = compact_field(str(error), 40)
+            print(f"{compact_field(name, 28):<28} invalid      -            -                {error_text}")
             continue
-        next_action = " ".join(task.next_action.split())
+        known_statuses = ("planning", "active", "blocked", "completed", "abandoned")
+        status = task.status if task.status in known_statuses else "legacy"
+        complexity = task.complexity if task.complexity in COMPLEXITIES else "legacy"
         print(
-            f"{task.name:<28} {(task.status or 'unknown'):<12} "
-            f"{(task.complexity or 'unknown'):<12} {(task.phase or 'unknown'):<16} {next_action}"
+            f"{compact_field(task.name, 28):<28} {status:<12} "
+            f"{complexity:<12} {compact_field(task.phase, 16):<16} "
+            f"{compact_field(task.next_action, 40, fallback='-')}"
         )
     return 0
 
