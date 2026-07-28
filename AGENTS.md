@@ -51,6 +51,7 @@
 ## Planning artifact gate
 
 - Classify the change before creating any standalone specification or implementation plan.
+- Use `simple` for localized low-risk work, `standard` for durable task tracking, and `complex` for high-risk, long-running, cross-module, or multi-agent work.
 - Simple, low-risk, localized work must be implemented directly after a short conversational plan; it must not create spec or plan files.
 - Treat documentation-only edits, small configuration changes, file moves, and obvious localized fixes as simple unless they introduce architectural or privacy risk.
 - Create a durable planning document only for complex, high-risk, ambiguous, cross-module work, or when I explicitly request one.

@@ -27,10 +27,21 @@ The design philosophy is:
 Primary commands:
 
 ```powershell
-python tools/workspace.py new my_task
+python tools/workspace.py new my_task --complexity standard
+python tools/workspace.py status
+python tools/workspace.py resume my_task
+python tools/workspace.py doctor my_task
+python tools/workspace.py verify my_task
+python tools/workspace.py close my_task
 python tools/workspace.py check
 python tools/workspace.py check --full
 ```
+
+Use `simple` for localized work without standalone planning artifacts,
+`standard` for durable task tracking, and `complex` for high-risk, long-running,
+or multi-agent work. `verify` previews commands unless `--run` is supplied.
+`--run` executes trusted shell commands with the task as the working directory;
+it is not a sandbox.
 
 ## 2. Current Root Structure
 
@@ -610,7 +621,7 @@ Global Codex skills and plugins live outside this repository and can change inde
 
 The intended day-to-day workflow is:
 
-1. Create a task with `python tools/workspace.py new <task_name>`.
+1. Create a task with `python tools/workspace.py new <task_name> --complexity standard`.
 2. Fill in `tasks/<task_name>/task.md`.
 3. Enter that task folder.
 4. Start the agent of choice.
@@ -673,7 +684,12 @@ Good next improvements would be:
 Use the unified workspace front door:
 
 ```bash
-python tools/workspace.py new my_task
+python tools/workspace.py new my_task --complexity standard
+python tools/workspace.py status
+python tools/workspace.py resume my_task
+python tools/workspace.py doctor my_task
+python tools/workspace.py verify my_task
+python tools/workspace.py close my_task
 python tools/workspace.py check
 python tools/workspace.py check --full
 ```
@@ -746,10 +762,17 @@ Treat this file as the single source of truth for understanding the workspace at
 日常统一入口：
 
 ```powershell
-python tools/workspace.py new my_task
+python tools/workspace.py new my_task --complexity standard
+python tools/workspace.py status
+python tools/workspace.py resume my_task
+python tools/workspace.py doctor my_task
+python tools/workspace.py verify my_task
+python tools/workspace.py close my_task
 python tools/workspace.py check
 python tools/workspace.py check --full
 ```
+
+`simple` 用于不创建独立规划文档的局部修改，`standard` 用于维护可恢复的任务状态，`complex` 用于高风险、长周期或多 Agent 协作任务。`verify` 默认只预览命令，明确添加 `--run` 后才执行；`--run` 不提供沙箱隔离。
 
 ## 2. 当前根目录结构
 
@@ -850,12 +873,22 @@ tasks/<task_name>/docs/skills/
 这是推荐的统一入口：
 
 ```powershell
-python tools/workspace.py new my_task
+python tools/workspace.py new my_task --complexity standard
+python tools/workspace.py status
+python tools/workspace.py resume my_task
+python tools/workspace.py doctor my_task
+python tools/workspace.py verify my_task
+python tools/workspace.py close my_task
 python tools/workspace.py check
 python tools/workspace.py check --full
 ```
 
 - `new`：创建隔离的正式任务目录。
+- `status`：列出任务状态、复杂度、阶段和下一动作。
+- `resume`：输出任务恢复所需的最小上下文。
+- `doctor`：检查任务状态、复杂度关口和协作契约。
+- `verify`：默认预览验证命令，添加 `--run` 后执行。
+- `close`：检查总结并将任务标记为完成，不负责归档或发布。
 - `check`：执行日常只读检查。
 - `check --full`：刷新维护报告并执行完整检查。
 
@@ -926,7 +959,7 @@ opencode .
 
 ## 11. 推荐日常工作流
 
-1. 在根目录运行 `python tools/workspace.py new <task_name>`。
+1. 在根目录运行 `python tools/workspace.py new <task_name> --complexity standard`。
 2. 填写 `tasks/<task_name>/task.md`。
 3. 进入该任务目录。
 4. 让 agent 读取根规则和任务规则。

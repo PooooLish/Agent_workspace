@@ -13,4 +13,5 @@ This directory contains durable documentation for the reusable workspace framewo
 ## Current Framework Decisions
 
 - [`framework/git-task-isolation.md`](framework/git-task-isolation.md): root Git privacy and independent task repository boundaries.
+- [`framework/task-lifecycle.md`](framework/task-lifecycle.md): task complexity, recovery, verification, and closeout rules.
 - [`framework/workspace-efficiency.md`](framework/workspace-efficiency.md): workspace commands, handoff, privacy checks, and deterministic maintenance behavior.

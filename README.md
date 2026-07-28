@@ -31,12 +31,31 @@ This workspace is a personal, reusable home for learning and using Codex, Claude
 Run:
 
 ```bash
-python tools/workspace.py new my_task
+python tools/workspace.py new my_task --complexity standard
 ```
 
 This creates `tasks/my_task/` with task-level docs, source folders, test folders, output folders, and local ignore rules.
 
 Concrete task folders stay local by default. Keep task status, registries, and cleanup notes inside the task folder unless you deliberately decide to publish them.
+
+Choose `simple` for localized work with no standalone planning artifacts,
+`standard` for durable task tracking, and `complex` for high-risk or multi-agent
+work that needs task-local planning and a coordination contract.
+
+## Task lifecycle
+
+```bash
+python tools/workspace.py status
+python tools/workspace.py resume my_task
+python tools/workspace.py doctor my_task
+python tools/workspace.py verify my_task
+python tools/workspace.py close my_task
+```
+
+`verify` previews task-defined commands. Add `--run` only when you deliberately
+want to execute them inside the task directory. `close` updates task state but
+does not archive, publish, delete, or run verification commands.
+`--run` executes trusted shell commands and is not a sandbox.
 
 ## How to publish a task independently
 
@@ -151,12 +170,27 @@ Get-Content -Raw -Encoding UTF8 WORKSPACE_GUIDE.md
 应在工作区根目录执行：
 
 ```bash
-python tools/workspace.py new my_task
+python tools/workspace.py new my_task --complexity standard
 ```
 
 这会创建 `tasks/my_task/`，包括任务规则、状态文档、源码、测试、输出、日志和任务私有技能目录。
 
 具体任务目录默认被 `.gitignore` 排除。任务状态、登记表和清理说明应保留在任务目录内部。需要发布时，经过人工审查后在该任务目录内初始化独立 Git 仓库，不得加入 workspace 根仓库。
+
+使用 `simple` 处理不需要独立规划文档的局部修改，使用 `standard` 维护可恢复的任务状态，使用 `complex` 处理高风险、长周期或多 Agent 协作任务。
+
+## 任务生命周期
+
+```bash
+python tools/workspace.py status
+python tools/workspace.py resume my_task
+python tools/workspace.py doctor my_task
+python tools/workspace.py verify my_task
+python tools/workspace.py close my_task
+```
+
+`verify` 默认只展示任务中登记的验证命令；只有明确添加 `--run` 才会在任务目录中执行。`close` 只检查总结并更新状态，不会归档、发布、删除任务或自动运行验证。
+`--run` 会执行受信任的 shell 命令，不提供沙箱隔离。
 
 ## 独立发布任务
 

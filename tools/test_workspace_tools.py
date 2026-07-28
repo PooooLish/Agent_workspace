@@ -9,7 +9,7 @@ import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 
-from workspace_manifest import CORE_MAINTENANCE_COMMANDS
+from workspace_manifest import CORE_MAINTENANCE_COMMANDS, TASK_LIFECYCLE_COMMANDS
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -62,9 +62,11 @@ class MakeTaskTests(unittest.TestCase):
         self.assertFalse(task_path.exists(), "dry-run unexpectedly created a task folder")
 
     def test_task_template_contains_handoff_sections(self) -> None:
-        text = self.make_task.build_task_md("example")
+        text = self.make_task.build_task_md("example", "standard")
         for heading in (
             "## Status",
+            "## Complexity",
+            "## Phase",
             "## Goal",
             "## Non-goals",
             "## Acceptance criteria",
@@ -76,6 +78,32 @@ class MakeTaskTests(unittest.TestCase):
         ):
             self.assertIn(heading, text)
         self.assertIn("planning", text)
+        self.assertIn("standard", text)
+
+    def test_complex_scaffold_adds_planning_and_coordination_files(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tasks").mkdir()
+
+            created, _ = self.make_task.scaffold_task(root, "example", complexity="complex")
+
+            planning = root / "tasks" / "example" / "docs" / "superpowers" / "README.md"
+            contract = root / "tasks" / "example" / "coordination" / "contract.md"
+            self.assertIn(str(planning), created)
+            self.assertIn(str(contract), created)
+            self.assertTrue(planning.is_file())
+            self.assertTrue(contract.is_file())
+
+    def test_simple_scaffold_does_not_add_planning_files(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tasks").mkdir()
+
+            self.make_task.scaffold_task(root, "example", complexity="simple")
+
+            task_root = root / "tasks" / "example"
+            self.assertFalse((task_root / "docs" / "superpowers").exists())
+            self.assertFalse((task_root / "coordination").exists())
 
     def test_scaffold_creates_summary_template(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -99,6 +127,363 @@ class MakeTaskTests(unittest.TestCase):
                 with self.subTest(task_name=task_name):
                     with self.assertRaises(ValueError):
                         self.make_task.scaffold_task(root, task_name)
+
+    def test_scaffold_rejects_invalid_complexity(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tasks").mkdir()
+
+            with self.assertRaises(ValueError):
+                self.make_task.scaffold_task(root, "example", complexity="huge")
+
+
+class TaskLifecycleTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.lifecycle = load_tool("task_lifecycle")
+
+    def write_task(
+        self,
+        root: Path,
+        name: str = "example",
+        *,
+        status: str = "active",
+        complexity: str = "standard",
+        phase: str = "implementation",
+        summary_complete: bool = True,
+    ) -> Path:
+        task_root = root / "tasks" / name
+        task_root.mkdir(parents=True)
+        task_root.joinpath("task.md").write_text(
+            f"""# Task: {name}
+
+## Status
+
+{status}
+
+## Complexity
+
+{complexity}
+
+## Phase
+
+{phase}
+
+## Goal
+
+Deliver the feature.
+
+## Non-goals
+
+No unrelated refactor.
+
+## Constraints
+
+- Stay local.
+
+## Inputs
+
+- Existing source.
+
+## Acceptance criteria
+
+- The command succeeds.
+
+## Verification commands
+
+```powershell
+python -c "print('verified')"
+```
+
+## Decisions
+
+- Keep Markdown as state.
+
+## Progress
+
+- Parser designed.
+
+## Next action
+
+Implement the command.
+
+## Blockers
+
+None
+""",
+            encoding="utf-8",
+        )
+        if summary_complete:
+            summary = """# Summary: example
+
+## Goal
+
+Deliver the feature.
+
+## Outcome
+
+Feature delivered.
+
+## Changes
+
+Added lifecycle commands.
+
+## Verification
+
+Tests passed.
+
+## Open issues
+
+None.
+"""
+        else:
+            summary = "# Summary: example\n\n## Goal\n\n## Outcome\n"
+        task_root.joinpath("summary.md").write_text(summary, encoding="utf-8")
+        return task_root
+
+    def test_load_task_parses_lifecycle_sections(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_task(root)
+
+            task = self.lifecycle.load_task(root, "example")
+
+            self.assertEqual(task.status, "active")
+            self.assertEqual(task.complexity, "standard")
+            self.assertEqual(task.phase, "implementation")
+            self.assertEqual(task.next_action, "Implement the command.")
+            self.assertEqual(task.verification_commands, ('python -c "print(\'verified\')"',))
+
+    def test_markdown_headings_inside_fences_do_not_replace_task_sections(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            task_root = self.write_task(root)
+            task_path = task_root / "task.md"
+            task_path.write_text(
+                task_path.read_text(encoding="utf-8").replace(
+                    'python -c "print(\'verified\')"',
+                    "## Status\npython -c \"print('verified')\"",
+                ),
+                encoding="utf-8",
+            )
+
+            task = self.lifecycle.load_task(root, "example")
+
+            self.assertEqual(task.status, "active")
+            self.assertEqual(task.verification_commands, ('python -c "print(\'verified\')"',))
+
+    def test_duplicate_lifecycle_heading_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            task_root = self.write_task(root)
+            task_path = task_root / "task.md"
+            task_path.write_text(
+                task_path.read_text(encoding="utf-8") + "\n## Status\n\nblocked\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "duplicate section"):
+                self.lifecycle.load_task(root, "example")
+
+    def test_legacy_task_defaults_are_compatible_with_close(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            task_root = self.write_task(root)
+            task_path = task_root / "task.md"
+            legacy = task_path.read_text(encoding="utf-8")
+            legacy = legacy.replace("## Complexity\n\nstandard\n\n", "")
+            legacy = legacy.replace("## Phase\n\nimplementation\n\n", "")
+            task_path.write_text(legacy, encoding="utf-8")
+
+            task = self.lifecycle.load_task(root, "example")
+
+            self.assertEqual(task.complexity, "standard")
+            self.assertEqual(task.phase, "implementation")
+            self.assertEqual(self.lifecycle.diagnose_task(task), [])
+            self.lifecycle.close_task(task)
+            closed = task_path.read_text(encoding="utf-8")
+            self.assertIn("## Complexity\n\nstandard", closed)
+            self.assertIn("## Phase\n\ncompleted", closed)
+
+    def test_resume_packet_contains_only_durable_context(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_task(root)
+
+            packet = self.lifecycle.build_resume_packet(self.lifecycle.load_task(root, "example"))
+
+            for text in (
+                "Status: active",
+                "Complexity: standard",
+                "Goal",
+                "Decisions",
+                "Progress",
+                "Next action",
+                "Blockers",
+                "python -c",
+            ):
+                self.assertIn(text, packet)
+
+    def test_doctor_reports_incomplete_task_and_complex_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            task_root = self.write_task(root, complexity="complex")
+            task_root.joinpath("task.md").write_text(
+                task_root.joinpath("task.md").read_text(encoding="utf-8").replace(
+                    "Implement the command.", "Describe the single next useful action."
+                ),
+                encoding="utf-8",
+            )
+
+            findings = self.lifecycle.diagnose_task(self.lifecycle.load_task(root, "example"))
+
+            self.assertTrue(any("Next action" in finding for finding in findings))
+            self.assertTrue(any("coordination/contract.md" in finding for finding in findings))
+
+    def test_doctor_rejects_planning_artifacts_for_simple_task(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            task_root = self.write_task(root, complexity="simple")
+            planning_root = task_root / "docs" / "superpowers"
+            planning_root.mkdir(parents=True)
+            planning_root.joinpath("plan.md").write_text("# Plan\n", encoding="utf-8")
+
+            findings = self.lifecycle.diagnose_task(self.lifecycle.load_task(root, "example"))
+
+            self.assertTrue(any("simple task" in finding for finding in findings))
+
+    def test_doctor_validates_complex_coordination_contract_columns(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            task_root = self.write_task(root, complexity="complex")
+            (task_root / "docs" / "superpowers").mkdir(parents=True)
+            contract = task_root / "coordination" / "contract.md"
+            contract.parent.mkdir()
+            contract.write_text("# Contract\n\n| ID | Owner |\n", encoding="utf-8")
+
+            findings = self.lifecycle.diagnose_task(self.lifecycle.load_task(root, "example"))
+
+            self.assertTrue(any("missing columns" in finding for finding in findings))
+
+    def test_doctor_accepts_valid_complex_coordination_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            task_root = self.write_task(root, complexity="complex")
+            (task_root / "docs" / "superpowers").mkdir(parents=True)
+            contract = task_root / "coordination" / "contract.md"
+            contract.parent.mkdir()
+            contract.write_text(
+                """# Contract
+
+| ID | Dependencies | Owner | Worktree | Allowed paths | Verification | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| T1 | None | agent-a | wt-a | src/a.py | python tests/a.py | in_progress |
+| T2 | T1 | agent-b | wt-b | src/a.py | python tests/b.py | pending |
+""",
+                encoding="utf-8",
+            )
+
+            findings = self.lifecycle.diagnose_task(self.lifecycle.load_task(root, "example"))
+
+            self.assertEqual(findings, [])
+
+            with self.assertRaisesRegex(ValueError, "unfinished coordination rows"):
+                self.lifecycle.close_task(self.lifecycle.load_task(root, "example"))
+
+    def test_doctor_rejects_unsafe_or_conflicting_coordination_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            task_root = self.write_task(root, complexity="complex")
+            (task_root / "docs" / "superpowers").mkdir(parents=True)
+            contract = task_root / "coordination" / "contract.md"
+            contract.parent.mkdir()
+            contract.write_text(
+                """# Contract
+
+| ID | Dependencies | Owner | Worktree | Allowed paths | Verification | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| T1 | T2 | agent-a | wt-a | ../outside.py | test-a | running |
+| T1 | Missing | agent-b | wt-b | src/shared.py | test-b | pending |
+| T2 | T1 | agent-c | wt-c | src/shared.py | test-c | pending |
+""",
+                encoding="utf-8",
+            )
+
+            findings = self.lifecycle.diagnose_task(self.lifecycle.load_task(root, "example"))
+            joined = "\n".join(findings)
+
+            self.assertIn("duplicate ID", joined)
+            self.assertIn("unknown dependency", joined)
+            self.assertIn("unsafe Allowed paths", joined)
+            self.assertIn("invalid Status", joined)
+            self.assertIn("dependency cycle", joined)
+
+    def test_verify_is_read_only_without_run_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_task(root)
+            calls: list[tuple[str, Path]] = []
+
+            with redirect_stdout(io.StringIO()):
+                code = self.lifecycle.verify_task(
+                    self.lifecycle.load_task(root, "example"),
+                    run=False,
+                    command_runner=lambda command, cwd: calls.append((command, cwd)) or 0,
+                )
+
+            self.assertEqual(code, 0)
+            self.assertEqual(calls, [])
+
+    def test_verify_runs_commands_in_task_and_stops_on_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            task_root = self.write_task(root)
+            calls: list[tuple[str, Path]] = []
+
+            def runner(command: str, cwd: Path) -> int:
+                calls.append((command, cwd))
+                return 5
+
+            with redirect_stdout(io.StringIO()):
+                code = self.lifecycle.verify_task(
+                    self.lifecycle.load_task(root, "example"),
+                    run=True,
+                    command_runner=runner,
+                )
+
+            self.assertEqual(code, 5)
+            self.assertEqual(calls, [('python -c "print(\'verified\')"', task_root)])
+
+    def test_default_command_runner_executes_one_line_in_selected_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            code = self.lifecycle.default_command_runner(
+                'python -c "import os; raise SystemExit(0 if os.getcwd() else 1)"',
+                Path(directory),
+            )
+
+            self.assertEqual(code, 0)
+
+    def test_close_requires_complete_summary(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_task(root, summary_complete=False)
+            task = self.lifecycle.load_task(root, "example")
+
+            with self.assertRaises(ValueError):
+                self.lifecycle.close_task(task)
+
+    def test_close_marks_task_completed_without_archiving(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            task_root = self.write_task(root)
+
+            self.lifecycle.close_task(self.lifecycle.load_task(root, "example"))
+
+            text = task_root.joinpath("task.md").read_text(encoding="utf-8")
+            self.assertIn("## Status\n\ncompleted", text)
+            self.assertIn("## Phase\n\ncompleted", text)
+            self.assertIn("## Next action\n\nNone", text)
+            self.assertTrue(task_root.is_dir())
 
 
 class GitReadinessTests(unittest.TestCase):
@@ -300,6 +685,33 @@ class CheckWorkspaceTests(unittest.TestCase):
                 with self.subTest(filename=filename, command=command):
                     self.assertIn(command, text)
 
+    def test_task_lifecycle_commands_are_in_docs(self) -> None:
+        doc_texts = {
+            "README.md": (ROOT / "README.md").read_text(encoding="utf-8"),
+            "WORKSPACE_GUIDE.md": (ROOT / "WORKSPACE_GUIDE.md").read_text(encoding="utf-8"),
+            "docs/framework/task-lifecycle.md": (
+                ROOT / "docs" / "framework" / "task-lifecycle.md"
+            ).read_text(encoding="utf-8"),
+        }
+
+        for filename, text in doc_texts.items():
+            for command in TASK_LIFECYCLE_COMMANDS:
+                with self.subTest(filename=filename, command=command):
+                    self.assertIn(command, text)
+
+    def test_task_verification_safety_and_ci_matrix_are_documented(self) -> None:
+        lifecycle = (ROOT / "docs" / "framework" / "task-lifecycle.md").read_text(
+            encoding="utf-8"
+        )
+        workflow = (ROOT / ".github" / "workflows" / "workspace-check.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("does not provide a sandbox", lifecycle)
+        self.assertIn("one command per line", lifecycle)
+        self.assertIn("ubuntu-latest", workflow)
+        self.assertIn("windows-latest", workflow)
+
     def test_ignored_private_task_index_is_inactive(self) -> None:
         self.assertFalse(self.check_workspace.private_task_index_is_active(ROOT))
 
@@ -451,6 +863,20 @@ class WorkspaceCommandTests(unittest.TestCase):
 
         self.assertEqual(code, 0)
         self.assertEqual(len(calls), 2)
+
+    def test_parser_exposes_lifecycle_commands(self) -> None:
+        parser = self.workspace.build_parser()
+
+        self.assertEqual(parser.parse_args(["status"]).command, "status")
+        self.assertEqual(parser.parse_args(["resume", "demo"]).task_name, "demo")
+        self.assertEqual(parser.parse_args(["doctor", "demo"]).task_name, "demo")
+        self.assertFalse(parser.parse_args(["verify", "demo"]).run)
+        self.assertTrue(parser.parse_args(["verify", "demo", "--run"]).run)
+        self.assertEqual(parser.parse_args(["close", "demo"]).task_name, "demo")
+        self.assertEqual(
+            parser.parse_args(["new", "demo", "--complexity", "complex"]).complexity,
+            "complex",
+        )
 
 
 class FirstCommitVerificationTests(unittest.TestCase):

@@ -4,7 +4,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from workspace_manifest import CORE_MAINTENANCE_COMMANDS, TOOL_DESCRIPTIONS
+from workspace_manifest import CORE_MAINTENANCE_COMMANDS, TASK_LIFECYCLE_COMMANDS, TOOL_DESCRIPTIONS
 
 
 def run_command(root: Path, args: list[str]) -> subprocess.CompletedProcess[str]:
@@ -89,6 +89,7 @@ def build_status(root: Path) -> str:
         "## Core Commands",
         "",
         "```powershell",
+        *TASK_LIFECYCLE_COMMANDS,
         *CORE_MAINTENANCE_COMMANDS,
         "```",
         "",

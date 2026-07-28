@@ -33,9 +33,17 @@ FULL_ONLY_STEPS = (
 
 
 CORE_MAINTENANCE_COMMANDS = [
-    "python tools/workspace.py new my_task",
+    "python tools/workspace.py new my_task --complexity standard",
     "python tools/workspace.py check",
     "python tools/workspace.py check --full",
+]
+
+TASK_LIFECYCLE_COMMANDS = [
+    "python tools/workspace.py status",
+    "python tools/workspace.py resume my_task",
+    "python tools/workspace.py doctor my_task",
+    "python tools/workspace.py verify my_task",
+    "python tools/workspace.py close my_task",
 ]
 
 TOOL_DESCRIPTIONS = {
@@ -48,6 +56,7 @@ TOOL_DESCRIPTIONS = {
     "tools/prepare_first_commit_report.py": "legacy-compatible implementation behind the baseline report command.",
     "tools/run_workspace_maintenance.py": "runs the full maintenance chain.",
     "tools/summarize_git_candidates.py": "summarizes Git candidates by area, extension, and largest files.",
+    "tools/task_lifecycle.py": "parses private task state and implements status, recovery, diagnosis, verification, and closeout behavior.",
     "tools/test_workspace_tools.py": "runs lightweight regression tests for workspace tools.",
     "tools/verify_baseline_report.py": "verifies that the baseline recommendation matches current Git candidates.",
     "tools/verify_first_commit_report.py": "legacy-compatible implementation behind the baseline report verifier.",

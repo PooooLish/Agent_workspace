@@ -7,6 +7,15 @@ import sys
 from pathlib import Path
 from typing import Callable, Sequence
 
+from task_lifecycle import (
+    COMPLEXITIES,
+    build_resume_packet,
+    close_task,
+    diagnose_task,
+    discover_task_names,
+    load_task,
+    verify_task,
+)
 from workspace_manifest import FULL_ONLY_STEPS, QUICK_CHECK_STEPS, StepSpec
 
 
@@ -56,23 +65,84 @@ def run_checks(root: Path, *, full: bool) -> int:
     return code
 
 
-def run_new(root: Path, task_name: str, *, dry_run: bool) -> int:
+def run_new(root: Path, task_name: str, *, dry_run: bool, complexity: str) -> int:
     command = [sys.executable, "tools/make_task.py", task_name]
     if dry_run:
         command.append("--dry-run")
+    command.extend(("--complexity", complexity))
     return subprocess.run(command, cwd=root, check=False).returncode
 
 
+def run_status(root: Path) -> int:
+    names = discover_task_names(root)
+    if not names:
+        print("No private task directories found.")
+        return 0
+    print(f"{'Task':<28} {'Status':<12} {'Complexity':<12} {'Phase':<16} Next action")
+    print("-" * 96)
+    for name in names:
+        try:
+            task = load_task(root, name)
+        except ValueError as error:
+            print(f"{name:<28} invalid      -            -                {error}")
+            continue
+        next_action = " ".join(task.next_action.split())
+        print(
+            f"{task.name:<28} {(task.status or 'unknown'):<12} "
+            f"{(task.complexity or 'unknown'):<12} {(task.phase or 'unknown'):<16} {next_action}"
+        )
+    return 0
+
+
+def run_doctor(root: Path, task_name: str | None) -> int:
+    names = [task_name] if task_name else discover_task_names(root)
+    if not names:
+        print("No private task directories found.")
+        return 0
+    finding_count = 0
+    for name in names:
+        try:
+            task = load_task(root, name)
+            findings = diagnose_task(task)
+        except ValueError as error:
+            findings = [str(error)]
+        if not findings:
+            print(f"[ok] {name}")
+            continue
+        print(f"[review] {name}")
+        for finding in findings:
+            print(f"  - {finding}")
+        finding_count += len(findings)
+    print(f"Doctor found {finding_count} item(s) requiring review.")
+    return 2 if finding_count else 0
+
+
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Create tasks and check the agent workspace.")
+    parser = argparse.ArgumentParser(description="Manage tasks and check the agent workspace.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     new_parser = subparsers.add_parser("new", help="create a private task scaffold")
     new_parser.add_argument("task_name")
     new_parser.add_argument("--dry-run", action="store_true")
+    new_parser.add_argument("--complexity", choices=COMPLEXITIES, default="standard")
 
     check_parser = subparsers.add_parser("check", help="run workspace checks")
     check_parser.add_argument("--full", action="store_true", help="generate and verify maintenance reports")
+
+    subparsers.add_parser("status", help="list private task lifecycle state")
+
+    resume_parser = subparsers.add_parser("resume", help="print a compact task recovery packet")
+    resume_parser.add_argument("task_name")
+
+    doctor_parser = subparsers.add_parser("doctor", help="report incomplete task lifecycle state")
+    doctor_parser.add_argument("task_name", nargs="?")
+
+    verify_parser = subparsers.add_parser("verify", help="preview or run task verification commands")
+    verify_parser.add_argument("task_name")
+    verify_parser.add_argument("--run", action="store_true", help="execute commands inside the task directory")
+
+    close_parser = subparsers.add_parser("close", help="validate summary and mark a task completed")
+    close_parser.add_argument("task_name")
     return parser
 
 
@@ -80,8 +150,33 @@ def main() -> int:
     root = Path(__file__).resolve().parents[1]
     args = build_parser().parse_args()
     if args.command == "new":
-        return run_new(root, args.task_name, dry_run=args.dry_run)
-    return run_checks(root, full=args.full)
+        return run_new(root, args.task_name, dry_run=args.dry_run, complexity=args.complexity)
+    if args.command == "check":
+        return run_checks(root, full=args.full)
+    if args.command == "status":
+        return run_status(root)
+    if args.command == "resume":
+        try:
+            print(build_resume_packet(load_task(root, args.task_name)))
+            return 0
+        except ValueError as error:
+            print(f"Error: {error}.")
+            return 1
+    if args.command == "doctor":
+        return run_doctor(root, args.task_name)
+    if args.command == "verify":
+        try:
+            return verify_task(load_task(root, args.task_name), run=args.run)
+        except ValueError as error:
+            print(f"Error: {error}.")
+            return 1
+    try:
+        close_task(load_task(root, args.task_name))
+    except ValueError as error:
+        print(f"Error: {error}.")
+        return 1
+    print(f"Task closed: {args.task_name}")
+    return 0
 
 
 if __name__ == "__main__":

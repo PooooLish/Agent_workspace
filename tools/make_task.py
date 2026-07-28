@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import re
-import sys
 from pathlib import Path
 
 
@@ -19,6 +19,7 @@ TASK_DIRS = [
 ]
 
 TASK_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
+COMPLEXITIES = ("simple", "standard", "complex")
 
 
 def write_if_missing(path: Path, content: str, created: list[str], skipped: list[str]) -> None:
@@ -69,10 +70,18 @@ def build_task_agents(task_name: str) -> str:
 """
 
 
-def build_task_md(task_name: str) -> str:
+def build_task_md(task_name: str, complexity: str = "standard") -> str:
     return f"""# Task: {task_name}
 
 ## Status
+
+planning
+
+## Complexity
+
+{complexity}
+
+## Phase
 
 planning
 
@@ -99,7 +108,7 @@ List the observable conditions that must be true for this task to be complete.
 
 ## Verification commands
 
-List the commands that prove the acceptance criteria.
+List one command per line that proves the acceptance criteria.
 
 ## Decisions
 
@@ -166,10 +175,34 @@ coverage/
 .env.*
 """
 
+COMPLEX_PLANNING_README = """# Task Planning
 
-def scaffold_task(workspace_root: Path, task_name: str) -> tuple[list[str], list[str]]:
+Keep task-specific specifications and implementation plans in this directory.
+Do not copy completed plans into the workspace root.
+"""
+
+COORDINATION_CONTRACT = """# Multi-Agent Coordination Contract
+
+Use one row per independently reviewable work item.
+Use relative paths inside the task directory. Dependent rows may reuse paths;
+independent rows must not overlap. For single-agent complex work, add one row
+whose values are `N/A` and whose status is `not-applicable`.
+
+| ID | Dependencies | Owner | Worktree | Allowed paths | Verification | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+"""
+
+
+def scaffold_task(
+    workspace_root: Path,
+    task_name: str,
+    *,
+    complexity: str = "standard",
+) -> tuple[list[str], list[str]]:
     if not TASK_NAME_RE.fullmatch(task_name):
         raise ValueError("task_name must start with a letter or number and contain only letters, numbers, underscores, or hyphens")
+    if complexity not in COMPLEXITIES:
+        raise ValueError(f"complexity must be one of: {', '.join(COMPLEXITIES)}")
 
     tasks_root = workspace_root / "tasks"
     task_root = tasks_root / task_name
@@ -188,23 +221,34 @@ def scaffold_task(workspace_root: Path, task_name: str) -> tuple[list[str], list
             created.append(str(dir_path))
 
     write_if_missing(task_root / "AGENTS.md", build_task_agents(task_name), created, skipped)
-    write_if_missing(task_root / "task.md", build_task_md(task_name), created, skipped)
+    write_if_missing(task_root / "task.md", build_task_md(task_name, complexity), created, skipped)
     write_if_missing(task_root / "README.md", build_readme(task_name), created, skipped)
     write_if_missing(task_root / "summary.md", build_summary_md(task_name), created, skipped)
     write_if_missing(task_root / ".gitignore", TASK_GITIGNORE, created, skipped)
+    if complexity == "complex":
+        write_if_missing(
+            task_root / "docs" / "superpowers" / "README.md",
+            COMPLEX_PLANNING_README,
+            created,
+            skipped,
+        )
+        write_if_missing(
+            task_root / "coordination" / "contract.md",
+            COORDINATION_CONTRACT,
+            created,
+            skipped,
+        )
     return created, skipped
 
 
 def main() -> int:
-    if len(sys.argv) not in (2, 3):
-        print("Usage: python tools/make_task.py task_name [--dry-run]")
-        return 1
-
-    task_name = sys.argv[1].strip()
-    dry_run = len(sys.argv) == 3 and sys.argv[2] == "--dry-run"
-    if len(sys.argv) == 3 and not dry_run:
-        print("Error: the only supported option is --dry-run.")
-        return 1
+    parser = argparse.ArgumentParser(description="Create a private task scaffold.")
+    parser.add_argument("task_name")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--complexity", choices=COMPLEXITIES, default="standard")
+    args = parser.parse_args()
+    task_name = args.task_name.strip()
+    dry_run = args.dry_run
 
     if not task_name:
         print("Error: task_name cannot be empty.")
@@ -224,10 +268,13 @@ def main() -> int:
         print("Planned files:")
         for filename in ("AGENTS.md", "task.md", "README.md", "summary.md", ".gitignore"):
             print(f"  + {task_root / filename}")
+        if args.complexity == "complex":
+            print(f"  + {task_root / 'docs' / 'superpowers' / 'README.md'}")
+            print(f"  + {task_root / 'coordination' / 'contract.md'}")
         return 0
 
     try:
-        created, skipped = scaffold_task(workspace_root, task_name)
+        created, skipped = scaffold_task(workspace_root, task_name, complexity=args.complexity)
     except ValueError as error:
         print(f"Error: {error}.")
         return 1
